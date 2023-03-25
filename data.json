@@ -1,0 +1,59 @@
+{
+  "nodes": [
+    {
+      "id": 0,
+      "title": "Pagina 0",
+      "text": "Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum",
+      "x": 68.61499531301689,
+      "y": 87.42710343732494
+    },
+    {
+      "id": 1,
+      "title": "Pagina 1",
+      "text": "Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLoremipsumLo remips umLoremips umLorem ipsumLoremipsumLorem ipsumLoremipsumLo  LoremipsumLor emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem emipsumLorem ipsumLoremipsum LoremipsumLore mipsumLoremipsum LoremipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum1",
+      "x": 732.3686432492221,
+      "y": 115.01971983349222
+    },
+    {
+      "id": 2,
+      "title": "Pagina 2",
+      "x": 147.55299117289735,
+      "y": 532.4351332633335
+    },
+    {
+      "id": 3,
+      "title": "Pagina 3",
+      "x": 1410.8212714452186,
+      "y": 57.272384613455664
+    },
+    {
+      "id": 4,
+      "title": "Pagina 4",
+      "text": "Lorem ipsum",
+      "x": 1457.0793768400194,
+      "y": 547.0453541237342
+    }
+  ],
+  "links": [
+    {
+      "source": 0,
+      "target": 1,
+      "text": "Scelta 1"
+    },
+    {
+      "source": 0,
+      "target": 2,
+      "text": "Scelta 2"
+    },
+    {
+      "source": 1,
+      "target": 3,
+      "text": "Scelta 3"
+    },
+    {
+      "source": 1,
+      "target": 4,
+      "text": "Scelta 4"
+    }
+  ]
+}
