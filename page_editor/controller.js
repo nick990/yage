@@ -20,9 +20,9 @@ try {
       // Aggiorna l'oggetto JSON
       page.title = title;
       page.text = text;
-
+      var updatePage = new Page(page);
       // Invia l'oggetto aggiornato al padre
-      window.opener.postMessage(JSON.stringify(page), "*");
+      window.opener.postMessage(updatePage, "*");
 
       // Chiudi la finestra
       window.close();

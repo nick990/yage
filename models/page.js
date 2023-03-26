@@ -1,5 +1,7 @@
 class Page{
-    
+    WIDTH = 300;
+    HEIGTH = 300;
+    NODE_CLASS = "node-page";
     constructor(id, title, text,x,y){
         this.id = id;
         this.title = title;

@@ -5,7 +5,7 @@ const height = 10000;
 const page_width = 300;
 const page_height = 300;
 const choice_width = 200;
-const choice_height = 200;
+const choice_height = 100;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -32,13 +32,6 @@ function drag(simulation) {
     const nodeIndex = nodes.findIndex((node) => node.id === draggedNode.id);
     nodes[nodeIndex].x = draggedNode.x;
     nodes[nodeIndex].y = draggedNode.y;
-
-    // Aggiornamento del testo delle coordinate
-    // d3.select(this)
-    //   .select(".coord-text")
-    //   .text(
-    //     "(" + draggedNode.x.toFixed(0) + ", " + draggedNode.y.toFixed(0) + ")"
-    //   );
   }
   return d3
     .drag()
@@ -60,7 +53,7 @@ function loadData() {
   // Definisci la funzione da eseguire al completamento della lettura del file
   reader.onload = function () {
     const data = JSON.parse(reader.result);
-    update(data);
+    buildDataFromJson(data);
   };
 
   // Leggi il contenuto del file come testo
@@ -105,10 +98,10 @@ function init() {
 
   node
     .append("foreignObject")
-    .attr("width", page_width)
-    .attr("height", page_height)
+    .attr("width", function(d) { return d.WIDTH; })
+    .attr("height", function(d) { return d.HEIGTH; })
     .attr("style", "overflow: visible;")
-    .attr("class", "node-page")
+    .attr("class", function(d) { return d.NODE_CLASS; })
     .attr("rx", 16)
     .attr("ry", 16)
     .append("xhtml:body")
@@ -135,61 +128,40 @@ function init() {
     .attr("stroke", "black")
     .attr("marker-end", "url(#arrow)");
 
-    const linkText = svg.selectAll(".link-text")
-  .data(links)
-  .join("foreignObject")
-  .attr("class", "link-text")
-  .attr("width", choice_width) // larghezza dell'oggetto foreign
-  .attr("height", choice_height) // altezza dell'oggetto foreign
-  .html((d) => d.getHTML());
-
-
   node.call(drag(simulation));
 
   simulation.on("tick", () => {
     link
-      .attr("x1", (d) => d.source.x + page_width)
-      .attr("y1", (d) => d.source.y + page_height / 2)
+      .attr("x1", (d) => d.source.x + d.source.WIDTH)
+      .attr("y1", (d) => d.source.y + d.source.HEIGTH / 2)
       .attr("x2", (d) => d.target.x)
-      .attr("y2", (d) => d.target.y + page_height / 2);
-
-    linkText
-      .attr("x", (d) => ((d.source.x + page_width + d.target.x) - choice_width) / 2)
-      .attr("y", (d) => ((d.source.y + page_height + d.target.y) -choice_height)/ 2);
+      .attr("y2", (d) => d.target.y + d.target.HEIGTH / 2);
 
     node.attr("transform", (d) => `translate(${d.x},${d.y})`);
   });
 }
 
 /**
- * Update graph from json data
+ * Update graph data from json data
  */
-function update(data) {
-  console.log("data");
-  console.log(data);
-  nodes = data.pages.map((page) => Page.fromJson(page));
-  console.log("nodes");
-  console.log(nodes);
-  console.log("links");
-  links = data.choices.map((link) => Choice.fromJson(link));
-  console.log(links)
+function buildDataFromJson(data) {
+  pages = data.pages.map((page) => Page.fromJson(page));
+  choices = data.choices.map((choice) => Choice.fromJson(choice));
+  nodes=[];
+  nodes = nodes.concat(pages);
+  nodes = nodes.concat(choices);
+  links=[];
+  data.choices.forEach((choice)=>{
+    links.push({source:choice.source,target:choice.id});
+    links.push({source:choice.id,target:choice.target});
+  });
   init();
 }
 
 function downloadJSON() {
-  var links_json = [];
-  links.forEach((link) => {
-    links_json.push({
-      source: link.source.id,
-      target: link.target.id,
-      text: link.text,
-    });
-  });
-  var nodes_json = [];
-  nodes.forEach((node) => {
-    nodes_json.push(node.toJson());
-  });
-  const data_to_save = { nodes: nodes_json, links: links_json };
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  const data_to_save = { pages: pages_json, choices: choices_json };
 
   const jsonString = JSON.stringify(data_to_save, null, 2);
   var blob = new Blob([jsonString], { type: "application/json" });
@@ -201,32 +173,42 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
-var popupWindow;
+
  // Aggiungi gestore per l'evento 'message' sulla finestra padre
  window.addEventListener("message", function(event) {
   // Verifica che il messaggio provenga dalla finestra di popup
-  if (event.source === editorPopup) {
+  if (event.source === pageEditorPopup) {
     // Analizza i dati ricevuti dal form
-    var updatedPage = JSON.parse(event.data);
-    console.log(updatedPage)
+    var updatedPage = Page.fromJson(JSON.parse(event.data));
     // Aggiorna l'oggetto page nell'array nodes
-    nodes[updatedPage.id].title = updatedPage.title;
-    nodes[updatedPage.id].text = updatedPage.text;
-
+    // nodes[updatedPage.id].title = updatedPage.title;
+    // nodes[updatedPage.id].text = updatedPage.text;
+    var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
+    nodes[nodeIndex] = updatedPage;
+    var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
+    pages[pageIndex] = updatedPage;
     // Chiudi la finestra di popup
-    editorPopup.close();
+    pageEditorPopup.close();
     init();
   }
 }, false);
 
 function editPage(id){
-  var page = nodes[id];
+  var page =  pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
   var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  editorPopup = window.open(url, "myForm", "width=400,height=400");
- 
+  pageEditorPopup = window.open(url, "myForm", "width=400,height=400"); 
 }
 
+
+/**
+ * Array of nodes for D3 graph
+ */
 nodes = [];
+/**
+ * Array of links for D3 graph
+ */
 links = [];
+pages= [];
+choices = [];
 init();

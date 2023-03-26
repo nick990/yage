@@ -1,22 +1,29 @@
 class Choice{
-    constructor(source,target,text){
+    WIDTH = 300;
+    HEIGTH = 150;
+    NODE_CLASS = "choice-page";
+    constructor(id,source,target,text,subtext,x,y){
+        this.id=id;
         this.source = source;
         this.target = target;
         this.text = text;
+        this.subtext = subtext;
+        this.x = x;
+        this.y = y;
     }
 
     static fromJson(json){
-        return new Choice(json.source, json.target, json.text);
+        return new Choice(json.id,json.source, json.target, json.text,json.subtext, json.x, json.y);
     }
 
     toJson(){
-        return {source: this.source, target: this.target, text: this.text};
+        return {id:this.id,source: this.source, target: this.target, text: this.text,subtext: this.subtext, x: this.x, y: this.y};
     }
 
     getHTML(){
         return "<div class=\"choice\">" +
         "<div class=\"choice-text\">" + this.text + "</div>" +
-        "<div >saidjasiodjsad adaspdkopaskdjas dlkasmdkasd asdkladklamsd</div>" +
+        "<div class=\"choice-subtext\">" + this.subtext + "</div>" +
         "</div>";
     }
 }

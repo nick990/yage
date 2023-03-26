@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>Grafo del libro game</title>
+    <link rel="stylesheet" type="text/css" href="styles/page.css">
+    <link rel="stylesheet" type="text/css" href="styles/choice.css">
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
         /* Stili per il grafo */
@@ -34,39 +36,6 @@
         }
         svg{
             background-color: #f5f5f5;
-        }
-        .node-page body{
-            height: 100%;
-            width: 100%;
-            background-color: white;
-            border: 1px solid black;
-            overflow: auto; 
-        }
-        .link-text{
-            /* height: 100%;
-            width: 100%; */
-            background-color: white;
-            border: 1px solid green;
-            overflow: auto; 
-        }
-        .page{        
-            margin: 10px 10px 10px 10px;           
-        }
-        .page-text{
-            font-size: 12px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        .page-title{
-            font-size: 16px;
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: bold;
-        }
-        .choice{        
-            margin: 10px 10px 10px 10px;           
-        }
-        .choice-text{
-            font-size: 12px;
-            font-family: Arial, Helvetica, sans-serif;
         }
         </style>
 </head>
