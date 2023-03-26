@@ -4,6 +4,8 @@ const width = 10000;
 const height = 10000;
 const page_width = 300;
 const page_height = 300;
+const choice_width = 200;
+const choice_height = 200;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -45,6 +47,9 @@ function drag(simulation) {
     .on("end", dragended);
 }
 
+/**
+ * Load data from file uploaded by user
+ */
 function loadData() {
   // Seleziona l'elemento file-input
   const input = document.getElementById("file-input");
@@ -130,16 +135,14 @@ function init() {
     .attr("stroke", "black")
     .attr("marker-end", "url(#arrow)");
 
-  // Aggiungiamo le etichette ai link
-  const linkText = svg
-    .selectAll(".link-text")
-    .data(links)
-    .join("text")
-    .attr("class", "link-text")
-    .attr("dy", "-5")
-    .attr("text-anchor", "middle")
-    .attr("font-size", 14)
-    .text((d) => d.text);
+    const linkText = svg.selectAll(".link-text")
+  .data(links)
+  .join("foreignObject")
+  .attr("class", "link-text")
+  .attr("width", choice_width) // larghezza dell'oggetto foreign
+  .attr("height", choice_height) // altezza dell'oggetto foreign
+  .html((d) => d.getHTML());
+
 
   node.call(drag(simulation));
 
@@ -151,15 +154,25 @@ function init() {
       .attr("y2", (d) => d.target.y + page_height / 2);
 
     linkText
-      .attr("x", (d) => (d.source.x + page_width + d.target.x) / 2)
-      .attr("y", (d) => (d.source.y + page_height + d.target.y) / 2);
+      .attr("x", (d) => ((d.source.x + page_width + d.target.x) - choice_width) / 2)
+      .attr("y", (d) => ((d.source.y + page_height + d.target.y) -choice_height)/ 2);
+
     node.attr("transform", (d) => `translate(${d.x},${d.y})`);
   });
 }
 
+/**
+ * Update graph from json data
+ */
 function update(data) {
-  nodes = data.nodes.map((node) => Page.fromJson(node));
-  links = data.links;
+  console.log("data");
+  console.log(data);
+  nodes = data.pages.map((page) => Page.fromJson(page));
+  console.log("nodes");
+  console.log(nodes);
+  console.log("links");
+  links = data.choices.map((link) => Choice.fromJson(link));
+  console.log(links)
   init();
 }
 

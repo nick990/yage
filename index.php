@@ -42,6 +42,13 @@
             border: 1px solid black;
             overflow: auto; 
         }
+        .link-text{
+            /* height: 100%;
+            width: 100%; */
+            background-color: white;
+            border: 1px solid green;
+            overflow: auto; 
+        }
         .page{        
             margin: 10px 10px 10px 10px;           
         }
@@ -53,6 +60,13 @@
             font-size: 16px;
             font-family: Arial, Helvetica, sans-serif;
             font-weight: bold;
+        }
+        .choice{        
+            margin: 10px 10px 10px 10px;           
+        }
+        .choice-text{
+            font-size: 12px;
+            font-family: Arial, Helvetica, sans-serif;
         }
         </style>
 </head>
@@ -68,6 +82,7 @@
         </svg>
     </div>
         <script type="text/javascript" src="models/page.js"></script>
+        <script type="text/javascript" src="models/choice.js"></script>
         <script type="text/javascript" src="graph.js"></script>
 </body>
 
