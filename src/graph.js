@@ -177,9 +177,10 @@ function downloadJSON() {
  // Aggiungi gestore per l'evento 'message' sulla finestra padre
  window.addEventListener("message", function(event) {
   // Verifica che il messaggio provenga dalla finestra di popup
-  if (event.source === pageEditorPopup) {
+  if (event.source === pageEditorPopup ) {
     // Analizza i dati ricevuti dal form
-    var updatedPage = Page.fromJson(JSON.parse(event.data));
+    var updatedPage = Page.fromJson(event.data);
+
     // Aggiorna l'oggetto page nell'array nodes
     // nodes[updatedPage.id].title = updatedPage.title;
     // nodes[updatedPage.id].text = updatedPage.text;
