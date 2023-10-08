@@ -1,8 +1,8 @@
 class Choice{
-    WIDTH = 300;
-    HEIGTH = 150;
-    NODE_CLASS = "choice-page";
     constructor(id,source,target,text,subtext,x,y){
+        this.WIDTH = 300;
+        this.HEIGTH = 150;
+        this.NODE_CLASS = "choice-page";
         this.id=id;
         this.source = source;
         this.target = target;
