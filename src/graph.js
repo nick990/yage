@@ -205,3 +205,7 @@ ipc.on("FILE_OPEN", (_, file) => {
   const data = JSON.parse(fs.readFileSync(file));
   buildDataFromJson(data);
 });
+// Menu 'File->Save file'
+ipc.on("FILE_SAVE", (_) => {
+  downloadJSON();
+});

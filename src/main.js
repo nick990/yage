@@ -33,6 +33,12 @@ function createWindow() {
             });
           }
         },
+        {
+          label: 'Save File',
+          click: () => {
+            mainWindow.webContents.send("FILE_SAVE");
+          }
+        },
         { role: "quit" },
       ],
     },
