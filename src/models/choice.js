@@ -2,7 +2,7 @@ class Choice{
     constructor(id,source,target,text,subtext,x,y){
         this.WIDTH = 300;
         this.HEIGTH = 150;
-        this.NODE_CLASS = "choice-page";
+        this.NODE_CLASS = "node-choice";
         this.id=id;
         this.source = source;
         this.target = target;

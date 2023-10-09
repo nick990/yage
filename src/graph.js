@@ -1,6 +1,6 @@
-const electron = require('electron');
+const electron = require("electron");
 const ipc = electron.ipcRenderer;
-const fs = require('fs');
+const fs = require("fs");
 
 // Creazione del grafo
 const svg = d3.select("svg");
@@ -44,7 +44,6 @@ function drag(simulation) {
     .on("end", dragended);
 }
 
-
 function init() {
   simulation = d3
     .forceSimulation(nodes)
@@ -83,10 +82,16 @@ function init() {
 
   node
     .append("foreignObject")
-    .attr("width", function(d) { return d.WIDTH; })
-    .attr("height", function(d) { return d.HEIGTH; })
+    .attr("width", function (d) {
+      return d.WIDTH;
+    })
+    .attr("height", function (d) {
+      return d.HEIGTH;
+    })
     .attr("style", "overflow: visible;")
-    .attr("class", function(d) { return d.NODE_CLASS; })
+    .attr("class", function (d) {
+      return d.NODE_CLASS;
+    })
     .attr("rx", 16)
     .attr("ry", 16)
     .append("xhtml:body")
@@ -132,17 +137,20 @@ function init() {
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
   choices = data.choices.map((choice) => Choice.fromJson(choice));
-  nodes=[];
+  nodes = [];
   nodes = nodes.concat(pages);
   nodes = nodes.concat(choices);
-  links=[];
-  data.choices.forEach((choice)=>{
-    links.push({source:choice.source,target:choice.id});
-    links.push({source:choice.id,target:choice.target});
+  links = [];
+  data.choices.forEach((choice) => {
+    links.push({ source: choice.source, target: choice.id });
+    links.push({ source: choice.id, target: choice.target });
   });
   init();
 }
 
+/**
+ * Donwload the current graph as json file
+ */
 function downloadJSON() {
   var choices_json = choices.map((choice) => choice.toJson());
   var pages_json = pages.map((page) => page.toJson());
@@ -158,46 +166,12 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
-
- // Aggiungi gestore per l'evento 'message' sulla finestra padre
- window.addEventListener("message", function(event) {
-  // Verifica che il messaggio provenga dalla finestra di popup
-  if (event.source === pageEditorPopup ) {
-    // Analizza i dati ricevuti dal form
-    var updatedPage = Page.fromJson(event.data);
-
-    // Aggiorna l'oggetto page nell'array nodes
-    // nodes[updatedPage.id].title = updatedPage.title;
-    // nodes[updatedPage.id].text = updatedPage.text;
-    var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
-    nodes[nodeIndex] = updatedPage;
-    var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
-    pages[pageIndex] = updatedPage;
-    // Chiudi la finestra di popup
-    pageEditorPopup.close();
-    init();
-  }
-}, false);
-
-function editPage(id){
-  var page =  pages.find((page) => page.id === id);
+function editPage(id) {
+  var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
   var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  pageEditorPopup = window.open(url, "myForm", "width=400,height=400"); 
+  pageEditorPopup = window.open(url, "myForm", "width=400,height=400");
 }
-
-
-/**
- * Array of nodes for D3 graph
- */
-nodes = [];
-/**
- * Array of links for D3 graph
- */
-links = [];
-pages= [];
-choices = [];
-init();
 
 // Gestione degli eventi
 // Menu 'File->Open file'
@@ -209,3 +183,39 @@ ipc.on("FILE_OPEN", (_, file) => {
 ipc.on("FILE_SAVE", (_) => {
   downloadJSON();
 });
+
+// Aggiungi gestore per l'evento 'message' sulla finestra padre
+window.addEventListener(
+  "message",
+  function (event) {
+    // Verifica che il messaggio provenga dalla finestra di popup
+    if (event.source === pageEditorPopup) {
+      // Analizza i dati ricevuti dal form
+      var updatedPage = Page.fromJson(event.data);
+
+      // Aggiorna l'oggetto page nell'array nodes
+      // nodes[updatedPage.id].title = updatedPage.title;
+      // nodes[updatedPage.id].text = updatedPage.text;
+      var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
+      nodes[nodeIndex] = updatedPage;
+      var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
+      pages[pageIndex] = updatedPage;
+      // Chiudi la finestra di popup
+      pageEditorPopup.close();
+      init();
+    }
+  },
+  false
+);
+
+/**
+ * Array of nodes for D3 graph
+ */
+nodes = [];
+/**
+ * Array of links for D3 graph
+ */
+links = [];
+pages = [];
+choices = [];
+init();
