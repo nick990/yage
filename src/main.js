@@ -1,22 +1,48 @@
-const electron = require("electron");
-
-
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const { app, dialog, Menu, BrowserWindow } = require("electron");
 
 let mainWindow;
 
-app.on("ready", (_) => {
+function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 1000,
+    width: 2000,
+    height: 1600,
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.webContents.openDevTools();
+
+  // Crea il menu
+  const template = [
+    {
+      label: "File",
+      submenu: [
+        {
+          label: 'Open File',
+          click: () => {
+            // Apri il dialog per selezionare un file
+            dialog.showOpenDialog(mainWindow, {
+              properties: ['openFile']
+            }, (filePaths) => {
+              if (!filePaths || filePaths.length === 0) {
+                // Nessun file selezionato o dialog cancellato
+                return;
+              }
+          
+              const selectedFilePath = filePaths[0];
+              mainWindow.webContents.send("FILE_OPEN", selectedFilePath);
+            });
+          }
+        },
+        { role: "quit" },
+      ],
+    },
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 
   mainWindow.on("closed", (_) => {
-    console.log("closed");
     mainWindow = null;
   });
-});
+}
 
+app.on("ready", createWindow);

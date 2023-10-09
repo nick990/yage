@@ -1,3 +1,7 @@
+const electron = require('electron');
+const ipc = electron.ipcRenderer;
+const fs = require('fs');
+
 // Creazione del grafo
 const svg = d3.select("svg");
 const width = 10000;
@@ -40,25 +44,6 @@ function drag(simulation) {
     .on("end", dragended);
 }
 
-/**
- * Load data from file uploaded by user
- */
-function loadData() {
-  // Seleziona l'elemento file-input
-  const input = document.getElementById("file-input");
-
-  // Crea un'istanza di FileReader
-  const reader = new FileReader();
-
-  // Definisci la funzione da eseguire al completamento della lettura del file
-  reader.onload = function () {
-    const data = JSON.parse(reader.result);
-    buildDataFromJson(data);
-  };
-
-  // Leggi il contenuto del file come testo
-  reader.readAsText(input.files[0]);
-}
 
 function init() {
   simulation = d3
@@ -213,3 +198,10 @@ links = [];
 pages= [];
 choices = [];
 init();
+
+// Gestione degli eventi
+// Menu 'File->Open file'
+ipc.on("FILE_OPEN", (_, file) => {
+  const data = JSON.parse(fs.readFileSync(file));
+  buildDataFromJson(data);
+});
