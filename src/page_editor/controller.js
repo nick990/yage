@@ -5,8 +5,6 @@ try {
   } catch (error) {
     console.error('Error parsing JSON data:', error);
   }
-
-    console.log(page);
     // Mostra l'oggetto JSON nei campi di input del form
     document.getElementById("title").value = page.title;
     document.getElementById("text").value = page.text;
@@ -20,9 +18,9 @@ try {
       // Aggiorna l'oggetto JSON
       page.title = title;
       page.text = text;
-      var updatePage = new Page(page);
+      var updatePage = new Page(page.id, page.title, page.text, page.x, page.y);
       // Invia l'oggetto aggiornato al padre
-      window.opener.postMessage(updatePage, "*");
+      window.opener.postMessage(updatePage.toJson(), "*");
 
       // Chiudi la finestra
       window.close();
