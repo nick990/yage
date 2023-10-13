@@ -1,14 +1,14 @@
-class Page{
-    constructor(id, title, text,x,y){
-        this.WIDTH = 300;
-        this.HEIGTH = 300;
-        this.NODE_CLASS = "node-page";
-        this.id = id;
-        this.title = title;
-        this.text = text;
-        this.x = x;
-        this.y = y;
-    }
+    class Page{
+        constructor(id, title, text, x, y){
+            this.WIDTH = 300;
+            this.HEIGTH = 300;
+            this.NODE_CLASS = "node-page";
+            this.id = id;
+            this.title = title;
+            this.text = text;
+            this.x = x;
+            this.y = y;
+        }
 
     static fromJson(json){
         return new Page(json.id, json.title, json.text, json.x, json.y);

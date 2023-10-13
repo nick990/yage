@@ -6,10 +6,6 @@ const fs = require("fs");
 const svg = d3.select("svg");
 const width = 10000;
 const height = 10000;
-const page_width = 300;
-const page_height = 300;
-const choice_width = 200;
-const choice_height = 100;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -136,6 +132,7 @@ function init() {
  */
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
+  console.log(pages);
   choices = data.choices.map((choice) => Choice.fromJson(choice));
   nodes = [];
   nodes = nodes.concat(pages);
@@ -166,6 +163,7 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
+// Click sul bottone di edit di una pagina
 function editPage(id) {
   var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
@@ -173,10 +171,27 @@ function editPage(id) {
   pageEditorPopup = window.open(url, "myForm", "width=400,height=400");
 }
 
+function newPage() {
+  var page = Page.fromJson({
+    id: 1,
+    title: "New Page",
+    text: "This is a new page",
+    x: 100.0,
+    y: 500.0,
+  });
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  pages_json.push(page);
+  var data = { pages: pages_json, choices: choices_json };
+  buildDataFromJson(data);
+}
+
+
 // Gestione degli eventi
 // Menu 'File->Open file'
-ipc.on("FILE_OPEN", (_, file) => {
-  const data = JSON.parse(fs.readFileSync(file));
+ipc.on("FILE_OPEN", (_, file_path) => {
+  const data = JSON.parse(fs.readFileSync(file_path));
+  console.log(data);
   buildDataFromJson(data);
 });
 // Menu 'File->Save file'
@@ -218,4 +233,4 @@ nodes = [];
 links = [];
 pages = [];
 choices = [];
-init();
+

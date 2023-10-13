@@ -17,27 +17,31 @@ function createWindow() {
       label: "File",
       submenu: [
         {
-          label: 'Open File',
+          label: "Open File",
           click: () => {
             // Apri il dialog per selezionare un file
-            dialog.showOpenDialog(mainWindow, {
-              properties: ['openFile']
-            }, (filePaths) => {
-              if (!filePaths || filePaths.length === 0) {
-                // Nessun file selezionato o dialog cancellato
-                return;
+            dialog.showOpenDialog(
+              mainWindow,
+              {
+                properties: ["openFile"],
+              },
+              (filePaths) => {
+                if (!filePaths || filePaths.length === 0) {
+                  // Nessun file selezionato o dialog cancellato
+                  return;
+                }
+
+                const selectedFilePath = filePaths[0];
+                mainWindow.webContents.send("FILE_OPEN", selectedFilePath);
               }
-          
-              const selectedFilePath = filePaths[0];
-              mainWindow.webContents.send("FILE_OPEN", selectedFilePath);
-            });
-          }
+            );
+          },
         },
         {
-          label: 'Save File',
+          label: "Save File",
           click: () => {
             mainWindow.webContents.send("FILE_SAVE");
-          }
+          },
         },
         { role: "quit" },
       ],
