@@ -7,6 +7,9 @@ const svg = d3.select("svg");
 const width = 10000;
 const height = 10000;
 
+let pageEditorPopup;
+let newPageEditorPopup;
+
 function drag(simulation) {
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -168,23 +171,15 @@ function editPage(id) {
   var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
   var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  pageEditorPopup = window.open(url, "myForm", "width=400,height=400");
+  pageEditorPopup = window.open(url, "myForm", "width=800,height=800");
 }
 
+// Click sul bottone di crezione pagina
 function newPage() {
-  var page = Page.fromJson({
-    id: 1,
-    title: "New Page",
-    text: "This is a new page",
-    x: 100.0,
-    y: 500.0,
-  });
-  var choices_json = choices.map((choice) => choice.toJson());
-  var pages_json = pages.map((page) => page.toJson());
-  pages_json.push(page);
-  var data = { pages: pages_json, choices: choices_json };
-  buildDataFromJson(data);
+  var url = "new_page_editor/form.html";
+  newPageEditorPopup = window.open(url, "myForm", "width=800,height=800");
 }
+
 
 
 // Gestione degli eventi
@@ -203,14 +198,10 @@ ipc.on("FILE_SAVE", (_) => {
 window.addEventListener(
   "message",
   function (event) {
-    // Verifica che il messaggio provenga dalla finestra di popup
     if (event.source === pageEditorPopup) {
       // Analizza i dati ricevuti dal form
       var updatedPage = Page.fromJson(event.data);
-
       // Aggiorna l'oggetto page nell'array nodes
-      // nodes[updatedPage.id].title = updatedPage.title;
-      // nodes[updatedPage.id].text = updatedPage.text;
       var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
       nodes[nodeIndex] = updatedPage;
       var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
@@ -218,6 +209,14 @@ window.addEventListener(
       // Chiudi la finestra di popup
       pageEditorPopup.close();
       init();
+    }
+    if (event.source === newPageEditorPopup) {
+      var choices_json = choices.map((choice) => choice.toJson());
+      var pages_json = pages.map((page) => page.toJson());
+      var newPage = Page.fromJson(event.data);
+      pages_json.push(newPage);
+      var data = { pages: pages_json, choices: choices_json };
+      buildDataFromJson(data);
     }
   },
   false
