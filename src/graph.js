@@ -6,10 +6,9 @@ const fs = require("fs");
 const svg = d3.select("svg");
 const width = 10000;
 const height = 10000;
-const page_width = 300;
-const page_height = 300;
-const choice_width = 200;
-const choice_height = 100;
+
+let pageEditorPopup;
+let newPageEditorPopup;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -133,9 +132,14 @@ function init() {
 
 /**
  * Update graph data from json data
+ * data : {
+ *   pages: [Page],
+ *   choices: [Choice]
+ * }
  */
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
+  console.log(pages);
   choices = data.choices.map((choice) => Choice.fromJson(choice));
   nodes = [];
   nodes = nodes.concat(pages);
@@ -166,17 +170,27 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
+// Click sul bottone di edit di una pagina
 function editPage(id) {
   var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
   var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  pageEditorPopup = window.open(url, "myForm", "width=400,height=400");
+  pageEditorPopup = window.open(url, "myForm", "width=800,height=800");
 }
+
+// Click sul bottone di crezione pagina
+function newPage() {
+  var url = "new_page_editor/form.html";
+  newPageEditorPopup = window.open(url, "myForm", "width=800,height=800");
+}
+
+
 
 // Gestione degli eventi
 // Menu 'File->Open file'
-ipc.on("FILE_OPEN", (_, file) => {
-  const data = JSON.parse(fs.readFileSync(file));
+ipc.on("FILE_OPEN", (_, file_path) => {
+  const data = JSON.parse(fs.readFileSync(file_path));
+  console.log(data);
   buildDataFromJson(data);
 });
 // Menu 'File->Save file'
@@ -188,14 +202,10 @@ ipc.on("FILE_SAVE", (_) => {
 window.addEventListener(
   "message",
   function (event) {
-    // Verifica che il messaggio provenga dalla finestra di popup
     if (event.source === pageEditorPopup) {
       // Analizza i dati ricevuti dal form
       var updatedPage = Page.fromJson(event.data);
-
       // Aggiorna l'oggetto page nell'array nodes
-      // nodes[updatedPage.id].title = updatedPage.title;
-      // nodes[updatedPage.id].text = updatedPage.text;
       var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
       nodes[nodeIndex] = updatedPage;
       var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
@@ -204,9 +214,26 @@ window.addEventListener(
       pageEditorPopup.close();
       init();
     }
+    if (event.source === newPageEditorPopup) {
+      var choices_json = choices.map((choice) => choice.toJson());
+      var pages_json = pages.map((page) => page.toJson());
+      var newPage = Page.fromJson(event.data);
+      newPage.id = findNextId();
+      pages_json.push(newPage);
+      var data = { pages: pages_json, choices: choices_json };
+      buildDataFromJson(data);
+    }
   },
   false
 );
+
+function findNextId() {
+  var maxId = 0;
+  nodes.forEach((node) => {
+    if (node.id > maxId) maxId = node.id;
+  });
+  return maxId + 1;
+}
 
 /**
  * Array of nodes for D3 graph
@@ -218,4 +245,4 @@ nodes = [];
 links = [];
 pages = [];
 choices = [];
-init();
+
