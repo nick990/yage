@@ -132,6 +132,10 @@ function init() {
 
 /**
  * Update graph data from json data
+ * data : {
+ *   pages: [Page],
+ *   choices: [Choice]
+ * }
  */
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
@@ -214,6 +218,7 @@ window.addEventListener(
       var choices_json = choices.map((choice) => choice.toJson());
       var pages_json = pages.map((page) => page.toJson());
       var newPage = Page.fromJson(event.data);
+      newPage.id = findNextId();
       pages_json.push(newPage);
       var data = { pages: pages_json, choices: choices_json };
       buildDataFromJson(data);
@@ -221,6 +226,14 @@ window.addEventListener(
   },
   false
 );
+
+function findNextId() {
+  var maxId = 0;
+  nodes.forEach((node) => {
+    if (node.id > maxId) maxId = node.id;
+  });
+  return maxId + 1;
+}
 
 /**
  * Array of nodes for D3 graph
