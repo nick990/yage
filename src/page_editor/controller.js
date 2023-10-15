@@ -1,3 +1,7 @@
+const electron = require("electron");
+const ipcRender = electron.ipcRenderer;
+const remote = electron.remote;
+
 const urlParams = new URLSearchParams(window.location.search);
 const data = urlParams.get("data");
 try {
@@ -19,9 +23,9 @@ function save() {
   page.title = title;
   page.text = text;
   var updatePage = new Page(page.id, page.title, page.text, page.x, page.y);
-  // Invia l'oggetto aggiornato al padre
-  window.opener.postMessage(updatePage.toJson(), "*");
 
+  ipcRender.send('PAGE-EDIT', updatePage.toJson());
   // Chiudi la finestra
+  var window = remote.getCurrentWindow();
   window.close();
 }

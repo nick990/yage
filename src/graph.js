@@ -8,7 +8,6 @@ const width = 10000;
 const height = 10000;
 
 let pageEditorPopup;
-let newPageEditorPopup;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -174,14 +173,12 @@ function downloadJSON() {
 function editPage(id) {
   var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
-  var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  pageEditorPopup = window.open(url, "myForm", "width=800,height=800");
+  ipc.send("OPEN_PAGE_EDITOR", pageJSON);
 }
 
 // Click sul bottone di crezione pagina
 function newPage() {
-  var url = "new_page_editor/form.html";
-  newPageEditorPopup = window.open(url, "myForm", "width=800,height=800");
+  ipc.send("OPEN_NEW_PAGE_EDITOR");
 }
 
 // Click sul bottone di elinamazione pagina
@@ -213,34 +210,31 @@ ipc.on("FILE_SAVE", (_) => {
   downloadJSON();
 });
 
-// Aggiungi gestore per l'evento 'message' sulla finestra padre
-window.addEventListener(
-  "message",
-  function (event) {
-    if (event.source === pageEditorPopup) {
-      // Analizza i dati ricevuti dal form
-      var updatedPage = Page.fromJson(event.data);
-      // Aggiorna l'oggetto page nell'array nodes
-      var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
-      nodes[nodeIndex] = updatedPage;
-      var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
-      pages[pageIndex] = updatedPage;
-      // Chiudi la finestra di popup
-      pageEditorPopup.close();
-      init();
-    }
-    if (event.source === newPageEditorPopup) {
-      var choices_json = choices.map((choice) => choice.toJson());
-      var pages_json = pages.map((page) => page.toJson());
-      var newPage = Page.fromJson(event.data);
-      newPage.id = findNextId();
-      pages_json.push(newPage);
-      var data = { pages: pages_json, choices: choices_json };
-      buildDataFromJson(data);
-    }
-  },
-  false
-);
+/**
+ * New page created from popup
+ */
+ipc.on("NEW-PAGE", (_, new_page) => {
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  var newPage = Page.fromJson(new_page);
+  newPage.id = findNextId();
+  pages_json.push(newPage);
+  var data = { pages: pages_json, choices: choices_json };
+  buildDataFromJson(data);
+});
+
+/**
+ * Page edited from popup
+ */
+ipc.on("PAGE-EDIT", (_, data) => {
+  var updatedPage = Page.fromJson(data);
+  // Aggiorna l'oggetto page nell'array nodes
+  var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
+  nodes[nodeIndex] = updatedPage;
+  var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
+  pages[pageIndex] = updatedPage;
+  init();
+});
 
 function findNextId() {
   var maxId = 0;
