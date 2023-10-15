@@ -1,4 +1,4 @@
-const { app, dialog, Menu, BrowserWindow } = require("electron");
+const { app, dialog, Menu, BrowserWindow, ipcMain } = require("electron");
 
 let mainWindow;
 
@@ -55,4 +55,30 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+function openNewPageEditor() {
+  win = new BrowserWindow({ width: 800, height: 600, autoHideMenuBar: true });
+  win.loadURL(`file://${__dirname}/new_page_editor/form.html`);
+}
+
+function openPageEditor(_, page) {
+  win = new BrowserWindow({ width: 800, height: 600, autoHideMenuBar: true });
+  win.loadURL(`file://${__dirname}/page_editor/form.html?data=${encodeURIComponent(page)}`);
+}
+
+app.on("ready", () => {
+  createWindow();
+
+  ipcMain.on("OPEN_NEW_PAGE_EDITOR", openNewPageEditor);
+  
+  ipcMain.on("NEW-PAGE", (_, page) => {
+    mainWindow.webContents.send("NEW-PAGE", page);
+  });
+
+  ipcMain.on("OPEN_PAGE_EDITOR",openPageEditor);
+
+  ipcMain.on("PAGE-EDIT", (_, page) => {
+    mainWindow.webContents.send("PAGE-EDIT", page);
+  });
+
+
+});
