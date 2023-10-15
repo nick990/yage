@@ -202,7 +202,6 @@ function deletePage(id){
 // Menu 'File->Open file'
 ipc.on("FILE_OPEN", (_, file_path) => {
   const data = JSON.parse(fs.readFileSync(file_path));
-  console.log(data);
   buildDataFromJson(data);
 });
 // Menu 'File->Save file'
@@ -218,6 +217,11 @@ ipc.on("NEW-PAGE", (_, new_page) => {
   var pages_json = pages.map((page) => page.toJson());
   var newPage = Page.fromJson(new_page);
   newPage.id = findNextId();
+  
+  const windowSize = electron.remote.getCurrentWindow().getSize();
+  newPage.x = actualScrollX + (windowSize[0]-newPage.WIDTH) / 2;
+  newPage.y = actualScrollY + (windowSize[1]-newPage.HEIGTH) / 2;
+
   pages_json.push(newPage);
   var data = { pages: pages_json, choices: choices_json };
   buildDataFromJson(data);
@@ -254,4 +258,11 @@ nodes = [];
 links = [];
 pages = [];
 choices = [];
-
+// Coordinates of the visible corner left top of the svg container scrolled
+var actualScrollX = 0;
+var actualScrollY = 0;
+const svgContainer = document.getElementById("svg-container");
+svgContainer.addEventListener("scroll", function(event) {
+  actualScrollX = svgContainer.scrollLeft;
+  actualScrollY = svgContainer.scrollTop;  
+});
