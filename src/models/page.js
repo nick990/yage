@@ -23,6 +23,7 @@
         "<div class=\"page-title\">" + this.title + "</div>" +
         "<div class=\"page-text\">" + this.text + "</div>" +
         "<button onclick=\"editPage(" + this.id + ")\">Edit</button>"+
+        "<button onclick=\"deletePage(" + this.id + ")\">Delete</button>"+
         "</div>";
     }
 }

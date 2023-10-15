@@ -44,6 +44,7 @@ function drag(simulation) {
 }
 
 function init() {
+  document.getElementById("svg").innerHTML = "";
   simulation = d3
     .forceSimulation(nodes)
     .force(
@@ -139,7 +140,6 @@ function init() {
  */
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
-  console.log(pages);
   choices = data.choices.map((choice) => Choice.fromJson(choice));
   nodes = [];
   nodes = nodes.concat(pages);
@@ -182,6 +182,21 @@ function editPage(id) {
 function newPage() {
   var url = "new_page_editor/form.html";
   newPageEditorPopup = window.open(url, "myForm", "width=800,height=800");
+}
+
+// Click sul bottone di elinamazione pagina
+function deletePage(id){
+  var pageIndex = pages.findIndex((page) => page.id === id);
+  pages.splice(pageIndex, 1);
+  var choicesToDelete = choices.filter((choice) => choice.source === id || choice.target === id);
+  choicesToDelete.forEach((choice) => {
+    var choiceIndex = choices.findIndex((c) => c.id === choice.id);
+    choices.splice(choiceIndex, 1);
+  });
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  var data = { pages: pages_json, choices: choices_json };
+  buildDataFromJson(data);
 }
 
 
