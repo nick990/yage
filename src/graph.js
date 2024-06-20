@@ -1,11 +1,13 @@
+const electron = require("electron");
+const ipc = electron.ipcRenderer;
+const fs = require("fs");
+
 // Creazione del grafo
 const svg = d3.select("svg");
 const width = 10000;
 const height = 10000;
-const page_width = 300;
-const page_height = 300;
-const choice_width = 200;
-const choice_height = 100;
+
+let pageEditorPopup;
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -40,27 +42,8 @@ function drag(simulation) {
     .on("end", dragended);
 }
 
-/**
- * Load data from file uploaded by user
- */
-function loadData() {
-  // Seleziona l'elemento file-input
-  const input = document.getElementById("file-input");
-
-  // Crea un'istanza di FileReader
-  const reader = new FileReader();
-
-  // Definisci la funzione da eseguire al completamento della lettura del file
-  reader.onload = function () {
-    const data = JSON.parse(reader.result);
-    buildDataFromJson(data);
-  };
-
-  // Leggi il contenuto del file come testo
-  reader.readAsText(input.files[0]);
-}
-
 function init() {
+  document.getElementById("svg").innerHTML = "";
   simulation = d3
     .forceSimulation(nodes)
     .force(
@@ -98,10 +81,16 @@ function init() {
 
   node
     .append("foreignObject")
-    .attr("width", function(d) { return d.WIDTH; })
-    .attr("height", function(d) { return d.HEIGTH; })
+    .attr("width", function (d) {
+      return d.WIDTH;
+    })
+    .attr("height", function (d) {
+      return d.HEIGTH;
+    })
     .attr("style", "overflow: visible;")
-    .attr("class", function(d) { return d.NODE_CLASS; })
+    .attr("class", function (d) {
+      return d.NODE_CLASS;
+    })
     .attr("rx", 16)
     .attr("ry", 16)
     .append("xhtml:body")
@@ -143,21 +132,28 @@ function init() {
 
 /**
  * Update graph data from json data
+ * data : {
+ *   pages: [Page],
+ *   choices: [Choice]
+ * }
  */
 function buildDataFromJson(data) {
   pages = data.pages.map((page) => Page.fromJson(page));
   choices = data.choices.map((choice) => Choice.fromJson(choice));
-  nodes=[];
+  nodes = [];
   nodes = nodes.concat(pages);
   nodes = nodes.concat(choices);
-  links=[];
-  data.choices.forEach((choice)=>{
-    links.push({source:choice.source,target:choice.id});
-    links.push({source:choice.id,target:choice.target});
+  links = [];
+  data.choices.forEach((choice) => {
+    links.push({ source: choice.source, target: choice.id });
+    links.push({ source: choice.id, target: choice.target });
   });
   init();
 }
 
+/**
+ * Donwload the current graph as json file
+ */
 function downloadJSON() {
   var choices_json = choices.map((choice) => choice.toJson());
   var pages_json = pages.map((page) => page.toJson());
@@ -173,33 +169,84 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
-
- // Aggiungi gestore per l'evento 'message' sulla finestra padre
- window.addEventListener("message", function(event) {
-  // Verifica che il messaggio provenga dalla finestra di popup
-  if (event.source === pageEditorPopup) {
-    // Analizza i dati ricevuti dal form
-    var updatedPage = Page.fromJson(JSON.parse(event.data));
-    // Aggiorna l'oggetto page nell'array nodes
-    // nodes[updatedPage.id].title = updatedPage.title;
-    // nodes[updatedPage.id].text = updatedPage.text;
-    var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
-    nodes[nodeIndex] = updatedPage;
-    var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
-    pages[pageIndex] = updatedPage;
-    // Chiudi la finestra di popup
-    pageEditorPopup.close();
-    init();
-  }
-}, false);
-
-function editPage(id){
-  var page =  pages.find((page) => page.id === id);
+// Click sul bottone di edit di una pagina
+function editPage(id) {
+  var page = pages.find((page) => page.id === id);
   var pageJSON = JSON.stringify(page);
-  var url = "page_editor/form.html?data=" + encodeURIComponent(pageJSON);
-  pageEditorPopup = window.open(url, "myForm", "width=400,height=400"); 
+  ipc.send("OPEN_PAGE_EDITOR", pageJSON);
 }
 
+// Click sul bottone di crezione pagina
+function newPage() {
+  ipc.send("OPEN_NEW_PAGE_EDITOR");
+}
+
+// Click sul bottone di elinamazione pagina
+function deletePage(id){
+  var pageIndex = pages.findIndex((page) => page.id === id);
+  pages.splice(pageIndex, 1);
+  var choicesToDelete = choices.filter((choice) => choice.source === id || choice.target === id);
+  choicesToDelete.forEach((choice) => {
+    var choiceIndex = choices.findIndex((c) => c.id === choice.id);
+    choices.splice(choiceIndex, 1);
+  });
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  var data = { pages: pages_json, choices: choices_json };
+  buildDataFromJson(data);
+}
+
+
+
+// Gestione degli eventi
+// Menu 'File->Open file'
+ipc.on("FILE_OPEN", (_, file_path) => {
+  const data = JSON.parse(fs.readFileSync(file_path));
+  buildDataFromJson(data);
+});
+// Menu 'File->Save file'
+ipc.on("FILE_SAVE", (_) => {
+  downloadJSON();
+});
+
+/**
+ * New page created from popup
+ */
+ipc.on("NEW-PAGE", (_, new_page) => {
+  var choices_json = choices.map((choice) => choice.toJson());
+  var pages_json = pages.map((page) => page.toJson());
+  var newPage = Page.fromJson(new_page);
+  newPage.id = findNextId();
+  
+  const windowSize = electron.remote.getCurrentWindow().getSize();
+  newPage.x = actualScrollX + (windowSize[0]-newPage.WIDTH) / 2;
+  newPage.y = actualScrollY + (windowSize[1]-newPage.HEIGTH) / 2;
+
+  pages_json.push(newPage);
+  var data = { pages: pages_json, choices: choices_json };
+  buildDataFromJson(data);
+});
+
+/**
+ * Page edited from popup
+ */
+ipc.on("PAGE-EDIT", (_, data) => {
+  var updatedPage = Page.fromJson(data);
+  // Aggiorna l'oggetto page nell'array nodes
+  var nodeIndex = nodes.findIndex((node) => node.id === updatedPage.id);
+  nodes[nodeIndex] = updatedPage;
+  var pageIndex = pages.findIndex((page) => page.id === updatedPage.id);
+  pages[pageIndex] = updatedPage;
+  init();
+});
+
+function findNextId() {
+  var maxId = 0;
+  nodes.forEach((node) => {
+    if (node.id > maxId) maxId = node.id;
+  });
+  return maxId + 1;
+}
 
 /**
  * Array of nodes for D3 graph
@@ -209,6 +256,13 @@ nodes = [];
  * Array of links for D3 graph
  */
 links = [];
-pages= [];
+pages = [];
 choices = [];
-init();
+// Coordinates of the visible corner left top of the svg container scrolled
+var actualScrollX = 0;
+var actualScrollY = 0;
+const svgContainer = document.getElementById("svg-container");
+svgContainer.addEventListener("scroll", function(event) {
+  actualScrollX = svgContainer.scrollLeft;
+  actualScrollY = svgContainer.scrollTop;  
+});
