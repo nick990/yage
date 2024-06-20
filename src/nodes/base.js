@@ -3,15 +3,22 @@
     PAGE_OUT = "page_out";
     CHOICE_OUT = "choice_out";
 
+
     var LiteGraph = global.LiteGraph;
     
     //Page
     function Page(){
         this.addInput("IN", CHOICE_OUT);        
         this.addOutput("OUT", PAGE_OUT);
+        this.addProperty("Header","");
+        this.addProperty("Body", "");
+        this.widget = this.addWidget("text","Header", "", "Header", {multiline: true});
+        this.widget = this.addWidget("text","Body", "", "Body", {multiline: true});
+        this.widgets_up = true;
     }
     Page.title = "Page";
     Page.desc = "A simple page";
+    Page.color = "#757A2B";
     LiteGraph.registerNodeType("basic/Page", Page);
 
     // Choice
@@ -21,6 +28,7 @@
     }
     Choice.title = "Choice";
     Choice.desc = "A simple choice";
+    Choice.color = "#2249CC";
     LiteGraph.registerNodeType("basic/Choice", Choice);
 
     // Funnel
