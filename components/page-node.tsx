@@ -98,6 +98,14 @@ export const PageNode = memo(
       };
     }, []);
 
+    // Definizione degli stili personalizzati per gli handle
+    const handleStyle = {
+      width: "16px", // Aumentata da 8px (default)
+      height: "16px", // Aumentata da 8px (default)
+      background: "#6366F1", // Colore indigo per abbinare il tema
+      border: "2px solid white",
+    };
+
     return (
       <div
         ref={nodeRef}
@@ -191,7 +199,7 @@ export const PageNode = memo(
             type="target"
             position={Position.Left}
             isConnectable={isConnectable}
-            className="w-6 h-6 bg-indigo-500 border-2 border-white"
+            className="node-handle"
           />
         )}
 
@@ -201,7 +209,7 @@ export const PageNode = memo(
             type="source"
             position={Position.Right}
             isConnectable={isConnectable}
-            className="w-6 h-6 bg-indigo-500 border-2 border-white"
+            className="node-handle"
           />
         )}
       </div>

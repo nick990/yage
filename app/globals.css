@@ -238,3 +238,11 @@
   -ms-overflow-style: auto !important; /* IE e Edge */
   scrollbar-color: rgba(100, 116, 139, 0.8) rgba(241, 245, 249, 0.8) !important; /* Firefox - colori thumb e track */
 }
+
+/* Stili per gli handle dei nodi ReactFlow */
+.node-handle {
+  width: 16px !important;
+  height: 16px !important;
+  background-color: #6366f1 !important; /* Colore indigo */
+  border: 2px solid white !important;
+}
