@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { memo, useRef } from "react";
+import { memo, useRef, useEffect } from "react";
 import { Handle, Position, type NodeProps, useReactFlow } from "reactflow";
 import { BookOpen, Trash2, Flag } from "lucide-react";
 
@@ -11,13 +11,20 @@ export const PageNode = memo(
   ({ data, isConnectable, id, selected }: NodeProps) => {
     const { setNodes, setEdges } = useReactFlow();
     const nodeRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
     const width = data.width || 360; // Default width
 
-    // Calculate dynamic height based on whether an image is present
+    // Base height without image
     const contentHeight = 140; // Fixed content height remains the same
-    const imageHeight = data.image ? 100 : 0; // Allow 100px for image + margin if present
     const headerHeight = 40; // Approx header height
-    const totalHeight = headerHeight + contentHeight + imageHeight;
+    const padding = 24; // Total padding (12px top + 12px bottom)
+
+    // Calcolo base dell'altezza senza immagine
+    let baseHeight = headerHeight + contentHeight + padding;
+
+    // Impostiamo una altezza minima, ma lasciamo che React-Flow gestisca
+    // l'altezza totale in base al contenuto se c'è un'immagine
+    const height = data.image ? "auto" : `${baseHeight}px`;
 
     // Function to handle node deletion
     const handleDelete = (event: React.MouseEvent) => {
@@ -38,6 +45,59 @@ export const PageNode = memo(
       );
     };
 
+    // Gestione migliorata dell'evento wheel
+    useEffect(() => {
+      const contentElement = contentRef.current;
+      if (!contentElement) return;
+
+      // Funzione di gestione dell'evento wheel
+      const handleWheel = (e: WheelEvent) => {
+        // Skip se si stanno usando tasti modificatori (ctrl/cmd per zoom)
+        if (e.ctrlKey || e.metaKey) return;
+
+        // Verifichiamo se l'area è scrollabile
+        const isScrollable =
+          contentElement.scrollHeight > contentElement.clientHeight;
+        if (!isScrollable) return; // Non fare nulla se non c'è scroll
+
+        // Calcola il margine di tolleranza (1px per gestire problemi di arrotondamento)
+        const tolerance = 1;
+
+        // Definisci i limiti con tolleranza
+        const isAtTop = contentElement.scrollTop <= tolerance;
+        const isAtBottom =
+          contentElement.scrollTop + contentElement.clientHeight >=
+          contentElement.scrollHeight - tolerance;
+
+        // Se scrolliamo verso il basso (deltaY > 0) e non siamo alla fine,
+        // oppure se scrolliamo verso l'alto (deltaY < 0) e non siamo all'inizio
+        if ((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) {
+          e.stopPropagation();
+          e.preventDefault(); // Previene qualsiasi scroll/zoom della pagina
+
+          // Applica lo scroll manualmente in modo fluido
+          contentElement.scrollTop += e.deltaY;
+        }
+        // Nelle zone di confine (top/bottom) con scroll nella direzione opposta,
+        // preveniamo comunque lo zoom
+        else if ((e.deltaY > 0 && isAtBottom) || (e.deltaY < 0 && isAtTop)) {
+          // Siamo al limite ma l'utente sta ancora cercando di scrollare
+          // nella stessa direzione - preveniamo lo zoom ma permettiamo
+          // che l'evento si propaghi al ReactFlow
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      };
+
+      // Aggiungi l'event listener
+      contentElement.addEventListener("wheel", handleWheel, { passive: false });
+
+      // Rimuovi l'event listener quando il componente si smonta
+      return () => {
+        contentElement.removeEventListener("wheel", handleWheel);
+      };
+    }, []);
+
     return (
       <div
         ref={nodeRef}
@@ -48,10 +108,11 @@ export const PageNode = memo(
         } bg-white`}
         style={{
           width: `${width}px`,
-          height: `${totalHeight}px`, // Use dynamic calculated height
+          height: height, // Use "auto" for nodes with images
           position: "relative",
           padding: "12px",
           overflow: "hidden",
+          minHeight: `${baseHeight}px`, // Garantisce un'altezza minima
         }}
       >
         <div className="flex items-center justify-between">
@@ -101,23 +162,24 @@ export const PageNode = memo(
         <div className="flex flex-col">
           {/* Content area with FIXED height regardless of image */}
           <div
+            ref={contentRef}
             className="mt-3 text-xs text-slate-600 overflow-y-scroll prose prose-sm max-w-none node-content"
             style={{
               height: "140px", // Fixed height for content area always
               paddingRight: "10px",
               overflowY: "scroll", // Always show scrollbar
+              touchAction: "pan-y", // Permettiamo solo pan-y sui dispositivi touch
             }}
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
 
-          {/* Display image if available in its own container */}
+          {/* Display image if available in its own container - full width */}
           {data.image && (
-            <div className="mt-3 mb-1">
+            <div className="mt-3 mb-1 w-full">
               <img
                 src={data.image || "/placeholder.svg"}
                 alt={`Image for ${data.title}`}
-                className="w-full h-auto object-contain rounded border border-slate-200"
-                style={{ maxHeight: "80px" }}
+                className="w-full h-auto object-cover rounded border border-slate-200"
               />
             </div>
           )}
