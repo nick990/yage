@@ -754,7 +754,24 @@ function GameBookEditorContent() {
             </defs>
           </svg>
 
-          <Controls className="bg-white border border-slate-200 rounded-md shadow-sm" />
+          <Controls className="bg-white border border-slate-200 rounded-md shadow-sm">
+            <button
+              className="react-flow__controls-button"
+              onClick={() => {
+                const startNode = nodes.find((node) => node.data.isStartNode);
+                if (startNode) {
+                  reactFlowInstance.setCenter(
+                    startNode.position.x,
+                    startNode.position.y,
+                    { duration: 800 }
+                  );
+                }
+              }}
+              title="Go to Start Page"
+            >
+              <BookOpen className="h-4 w-4" />
+            </button>
+          </Controls>
           <MiniMap
             nodeStrokeWidth={3}
             zoomable
