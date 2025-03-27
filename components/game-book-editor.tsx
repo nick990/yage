@@ -718,7 +718,6 @@ function GameBookEditorContent() {
           onPaneClick={onPaneClick}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          fitView
           deleteKeyCode={["Backspace", "Delete"]}
           edgeUpdaterRadius={10}
           onEdgeUpdate={(oldEdge, newConnection) => {
@@ -765,6 +764,8 @@ function GameBookEditorContent() {
             nodeStrokeWidth={3}
             zoomable
             pannable
+            draggable
+            maskColor="rgba(0, 0, 0, 0.1)"
             className="bg-white border border-slate-200 rounded-md shadow-sm"
             nodeColor={(node) => {
               if (node.type === "choice") return "#8b5cf6";
