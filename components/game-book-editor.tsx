@@ -512,11 +512,6 @@ function GameBookEditorContent() {
     }
   };
 
-  // Fit view to show all nodes
-  const fitView = () => {
-    reactFlowInstance.fitView({ padding: 0.2 });
-  };
-
   // Export the game book to JSON
   const exportToJson = () => {
     // Create a map of nodes by ID for easy lookup
@@ -816,14 +811,6 @@ function GameBookEditorContent() {
               >
                 <Upload className="h-4 w-4" />
                 Import
-              </Button>
-              <Button
-                onClick={fitView}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-              >
-                <ZoomIn className="h-4 w-4" />
-                Fit View
               </Button>
               <Button
                 onClick={resetCanvas}
