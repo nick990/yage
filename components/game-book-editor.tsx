@@ -38,6 +38,7 @@ import {
   Trash,
   File,
   ChevronDown,
+  Share2,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -600,6 +601,84 @@ function GameBookEditorContent() {
     URL.revokeObjectURL(url);
   };
 
+  // Export game book to simplified JSON format
+  const exportToJson = () => {
+    // Create maps for quick lookups
+    const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+    const incomingEdgesMap = new Map<string, string[]>();
+    const outgoingEdgesMap = new Map<string, string[]>();
+
+    // Build edge maps
+    edges.forEach((edge) => {
+      // Incoming edges
+      if (!incomingEdgesMap.has(edge.target)) {
+        incomingEdgesMap.set(edge.target, []);
+      }
+      incomingEdgesMap.get(edge.target)?.push(edge.source);
+
+      // Outgoing edges
+      if (!outgoingEdgesMap.has(edge.source)) {
+        outgoingEdgesMap.set(edge.source, []);
+      }
+      outgoingEdgesMap.get(edge.source)?.push(edge.target);
+    });
+
+    // Process pages
+    const pages = nodes
+      .filter((node) => node.type === "page")
+      .map((node) => ({
+        id: node.id,
+        title: node.data.title,
+        content: node.data.content,
+        image: node.data.image,
+        isStartNode: node.data.isStartNode,
+        isEndNode: node.data.isEndNode,
+        incomingChoices:
+          incomingEdgesMap
+            .get(node.id)
+            ?.filter((id) => nodeMap.get(id)?.type === "choice") || [],
+        outgoingChoices:
+          outgoingEdgesMap
+            .get(node.id)
+            ?.filter((id) => nodeMap.get(id)?.type === "choice") || [],
+      }));
+
+    // Process choices
+    const choices = nodes
+      .filter((node) => node.type === "choice")
+      .map((node) => ({
+        id: node.id,
+        title: node.data.title,
+        content: node.data.content,
+        image: node.data.image,
+        incomingPages:
+          incomingEdgesMap
+            .get(node.id)
+            ?.filter((id) => nodeMap.get(id)?.type === "page") || [],
+        outgoingPage:
+          outgoingEdgesMap
+            .get(node.id)
+            ?.find((id) => nodeMap.get(id)?.type === "page") || null,
+      }));
+
+    const gameBookData = {
+      pages,
+      choices,
+    };
+
+    const jsonString = JSON.stringify(gameBookData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "game-book-export.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   // Import JSON file
   const loadFromJson = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -761,6 +840,13 @@ function GameBookEditorContent() {
             >
               <Upload className="h-4 w-4" />
               Load
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={exportToJson}
+              className="flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Export
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={resetCanvas}
