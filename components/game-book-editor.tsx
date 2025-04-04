@@ -329,12 +329,49 @@ function GameBookEditorContent() {
 
   // Handle title change
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNodeTitle(e.target.value);
+    const newTitle = e.target.value;
+    setNodeTitle(newTitle);
+    if (selectedNode) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNode.id) {
+            const updatedNode = {
+              ...node,
+              data: {
+                ...node.data,
+                title: newTitle,
+              },
+            };
+            setSelectedNode(updatedNode);
+            return updatedNode;
+          }
+          return node;
+        })
+      );
+    }
   };
 
   // Handle content change
   const handleContentChange = (content: string) => {
     setNodeContent(content);
+    if (selectedNode) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNode.id) {
+            const updatedNode = {
+              ...node,
+              data: {
+                ...node.data,
+                content: content,
+              },
+            };
+            setSelectedNode(updatedNode);
+            return updatedNode;
+          }
+          return node;
+        })
+      );
+    }
   };
 
   // Handle image upload
@@ -918,12 +955,6 @@ function GameBookEditorContent() {
                   content={nodeContent}
                   onChange={handleContentChange}
                 />
-                <Button
-                  onClick={updateNodeData}
-                  className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
-                  Apply Changes
-                </Button>
               </div>
 
               {/* Image section */}
