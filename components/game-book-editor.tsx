@@ -36,8 +36,16 @@ import {
   X,
   Image,
   Trash,
+  File,
+  ChevronDown,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -703,6 +711,7 @@ function GameBookEditorContent() {
         <Button
           onClick={addPageNode}
           variant="outline"
+          size="sm"
           className="flex items-center gap-2 bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
         >
           <BookOpen className="h-4 w-4" />
@@ -711,6 +720,7 @@ function GameBookEditorContent() {
         <Button
           onClick={addEndPageNode}
           variant="outline"
+          size="sm"
           className="flex items-center gap-2 bg-white hover:bg-rose-50 hover:text-rose-600 border-slate-200"
         >
           <Flag className="h-4 w-4" />
@@ -719,35 +729,48 @@ function GameBookEditorContent() {
         <Button
           onClick={addChoiceNode}
           variant="outline"
+          size="sm"
           className="flex items-center gap-2 bg-white hover:bg-violet-50 hover:text-violet-600 border-slate-200"
         >
           <ArrowRightFromLine className="h-4 w-4" />
           Add Choice
         </Button>
-        <Button
-          onClick={exportToJson}
-          variant="outline"
-          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
-        <Button
-          onClick={handleImportClick}
-          variant="outline"
-          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-        >
-          <Upload className="h-4 w-4" />
-          Import
-        </Button>
-        <Button
-          onClick={resetCanvas}
-          variant="outline"
-          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Reset
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
+            >
+              <File className="h-4 w-4" />
+              File
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={exportToJson}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleImportClick}
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Import
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={resetCanvas}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Reset
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <input
           type="file"
           ref={fileInputRef}
