@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -79,7 +79,7 @@ function CustomEdge({
     targetPosition,
   });
 
-  const onEdgeClick = (evt: React.MouseEvent, id: string) => {
+  const onEdgeDeleteClick = (evt: React.MouseEvent, id: string) => {
     evt.stopPropagation();
     if (window.confirm("Are you sure you want to delete this connection?")) {
       setEdges((edges) => edges.filter((edge) => edge.id !== id));
@@ -106,15 +106,15 @@ function CustomEdge({
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
-              zIndex: 10,
+              zIndex: 10000,
             }}
             className="nodrag nopan"
           >
             <button
-              className="flex items-center justify-center w-5 h-5 rounded-full bg-white border border-slate-200 shadow-md hover:bg-rose-50 hover:text-rose-500 transition-colors"
-              onClick={(event) => onEdgeClick(event, id)}
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-white/100 border border-slate-200 shadow-md hover:bg-rose-50 hover:text-rose-500 transition-colors z-[10000] relative"
+              onClick={(event) => onEdgeDeleteClick(event, id)}
             >
-              <X className="w-3 h-3" />
+              <Trash className="w-3 h-3" />
             </button>
           </div>
         </EdgeLabelRenderer>
@@ -168,6 +168,14 @@ function GameBookEditorContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
+  // Memoize edgeTypes
+  const memoizedEdgeTypes = useMemo(
+    () => ({
+      custom: CustomEdge,
+    }),
+    []
+  );
+
   // Update form fields when selected node changes
   useEffect(() => {
     if (selectedNode) {
@@ -199,57 +207,6 @@ function GameBookEditorContent() {
       );
     },
     [nodes, setEdges]
-  );
-
-  // Handle node deletion
-  const onNodesDelete = useCallback(
-    (nodesToDelete: Node[]) => {
-      // Prevent deletion of start node
-      const filteredNodesToDelete = nodesToDelete.filter(
-        (node) => !node.data.isStartNode
-      );
-
-      if (filteredNodesToDelete.length !== nodesToDelete.length) {
-        alert("The start page cannot be deleted.");
-      }
-
-      if (filteredNodesToDelete.length === 0) return;
-
-      // Also delete connected edges when a node is deleted
-      const nodeIdsToDelete = filteredNodesToDelete.map((node) => node.id);
-      setEdges((eds) =>
-        eds.filter(
-          (edge) =>
-            !nodeIdsToDelete.includes(edge.source) &&
-            !nodeIdsToDelete.includes(edge.target)
-        )
-      );
-
-      // Clear selected node if it was deleted
-      if (selectedNode && nodeIdsToDelete.includes(selectedNode.id)) {
-        setSelectedNode(null);
-      }
-
-      // Remove the nodes
-      setNodes((nodes) =>
-        nodes.filter((node) => !nodeIdsToDelete.includes(node.id))
-      );
-    },
-    [setEdges, selectedNode, setNodes]
-  );
-
-  // Handle edge deletion
-  const onEdgesDelete = useCallback(
-    (edgesToDelete: Edge[]) => {
-      // Clear selected edge if it was deleted
-      if (
-        selectedEdge &&
-        edgesToDelete.some((edge) => edge.id === selectedEdge.id)
-      ) {
-        setSelectedEdge(null);
-      }
-    },
-    [selectedEdge]
   );
 
   // Convert existing edges to custom type with delete button
@@ -473,38 +430,6 @@ function GameBookEditorContent() {
   const onPaneClick = () => {
     setSelectedNode(null);
     setSelectedEdge(null);
-  };
-
-  // Delete a node by ID
-  const deleteNode = (nodeId: string) => {
-    // Check if this is the start node
-    const nodeToDelete = nodes.find((node) => node.id === nodeId);
-    if (nodeToDelete?.data.isStartNode) {
-      alert("The start page cannot be deleted.");
-      return;
-    }
-
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-
-    // Also delete connected edges
-    setEdges((eds) =>
-      eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
-    );
-
-    // Clear selected node if it was deleted
-    if (selectedNode && selectedNode.id === nodeId) {
-      setSelectedNode(null);
-    }
-  };
-
-  // Delete an edge by ID
-  const deleteEdge = (edgeId: string) => {
-    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
-
-    // Clear selected edge if it was deleted
-    if (selectedEdge && selectedEdge.id === edgeId) {
-      setSelectedEdge(null);
-    }
   };
 
   // Reset the canvas
@@ -882,7 +807,7 @@ function GameBookEditorContent() {
             onEdgeClick={onEdgeClick}
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
+            edgeTypes={memoizedEdgeTypes}
             deleteKeyCode={["Backspace", "Delete"]}
             edgeUpdaterRadius={10}
             onEdgeUpdate={(oldEdge, newConnection: Connection) => {
@@ -903,8 +828,6 @@ function GameBookEditorContent() {
                 )
               );
             }}
-            onNodesDelete={onNodesDelete}
-            onEdgesDelete={onEdgesDelete}
             nodesDraggable={true}
             minZoom={0.1}
             maxZoom={2}
@@ -1051,17 +974,6 @@ function GameBookEditorContent() {
                 </div>
               </div>
 
-              <div className="flex justify-between">
-                {!selectedNode.data.isStartNode && (
-                  <Button
-                    onClick={() => deleteNode(selectedNode.id)}
-                    variant="destructive"
-                    className="mt-2 bg-rose-600 hover:bg-rose-700"
-                  >
-                    Delete Node
-                  </Button>
-                )}
-              </div>
               <div>
                 <p className="text-sm text-slate-500">
                   Node ID: {selectedNode.id}
@@ -1104,15 +1016,6 @@ function GameBookEditorContent() {
                 <p className="text-sm text-slate-500">
                   To: {selectedEdge.target}
                 </p>
-              </div>
-              <div>
-                <Button
-                  onClick={() => deleteEdge(selectedEdge.id)}
-                  variant="destructive"
-                  className="mt-2 bg-rose-600 hover:bg-rose-700"
-                >
-                  Delete Connection
-                </Button>
               </div>
             </div>
           </div>

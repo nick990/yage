@@ -36,13 +36,16 @@ export const PageNode = memo(
         return;
       }
 
-      // Delete the node directly
-      setNodes((nodes) => nodes.filter((node) => node.id !== id));
+      // Ask for confirmation
+      if (window.confirm("Are you sure you want to delete this page?")) {
+        // Delete the node directly
+        setNodes((nodes) => nodes.filter((node) => node.id !== id));
 
-      // Delete connected edges
-      setEdges((edges) =>
-        edges.filter((edge) => edge.source !== id && edge.target !== id)
-      );
+        // Delete connected edges
+        setEdges((edges) =>
+          edges.filter((edge) => edge.source !== id && edge.target !== id)
+        );
+      }
     };
 
     // Gestione migliorata dell'evento wheel

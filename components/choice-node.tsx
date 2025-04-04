@@ -18,13 +18,16 @@ export const ChoiceNode = memo(
     const handleDelete = (event: React.MouseEvent) => {
       event.stopPropagation(); // Prevent node selection when clicking delete
 
-      // Delete the node directly
-      setNodes((nodes) => nodes.filter((node) => node.id !== id));
+      // Ask for confirmation
+      if (window.confirm("Are you sure you want to delete this choice?")) {
+        // Delete the node directly
+        setNodes((nodes) => nodes.filter((node) => node.id !== id));
 
-      // Delete connected edges
-      setEdges((edges) =>
-        edges.filter((edge) => edge.source !== id && edge.target !== id)
-      );
+        // Delete connected edges
+        setEdges((edges) =>
+          edges.filter((edge) => edge.source !== id && edge.target !== id)
+        );
+      }
     };
 
     return (
