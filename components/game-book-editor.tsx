@@ -521,7 +521,7 @@ function GameBookEditorContent() {
   };
 
   // Export the game book to JSON
-  const exportToJson = () => {
+  const saveToJson = () => {
     // Create a map of nodes by ID for easy lookup
     const nodesMap = new Map(nodes.map((node) => [node.id, node]));
 
@@ -601,7 +601,7 @@ function GameBookEditorContent() {
   };
 
   // Import JSON file
-  const importJson = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const loadFromJson = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -639,7 +639,7 @@ function GameBookEditorContent() {
           importedEdges = jsonData.edges.map((edge: Edge) => ({
             ...edge,
             type: "custom",
-            style: { stroke: "#6366f1", strokeWidth: 2.5, zindex: 9999 },
+            style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
           }));
         }
         // Otherwise, reconstruct edges from the denormalized structure
@@ -749,18 +749,18 @@ function GameBookEditorContent() {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
-              onClick={exportToJson}
+              onClick={saveToJson}
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
-              Export
+              Save
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleImportClick}
               className="flex items-center gap-2"
             >
               <Upload className="h-4 w-4" />
-              Import
+              Load
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={resetCanvas}
@@ -774,7 +774,7 @@ function GameBookEditorContent() {
         <input
           type="file"
           ref={fileInputRef}
-          onChange={importJson}
+          onChange={loadFromJson}
           accept=".json"
           className="hidden"
         />
