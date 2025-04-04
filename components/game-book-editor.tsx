@@ -97,7 +97,7 @@ function CustomEdge({
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: "all",
-              zindex: 10,
+              zIndex: 10,
             }}
             className="nodrag nopan"
           >
@@ -183,7 +183,7 @@ function GameBookEditorContent() {
           {
             ...params,
             type: "custom",
-            style: { stroke: "#6366f1", strokeWidth: 2.5, zindex: 9999 },
+            style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
           },
           eds
         )
@@ -649,7 +649,7 @@ function GameBookEditorContent() {
                   source: node.id,
                   target: choiceId,
                   type: "custom",
-                  style: { stroke: "#6366f1", strokeWidth: 2.5, zindex: 9999 },
+                  style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
                 });
               });
             }
@@ -661,7 +661,7 @@ function GameBookEditorContent() {
                 source: node.id,
                 target: node.destination,
                 type: "custom",
-                style: { stroke: "#6366f1", strokeWidth: 2.5, zindex: 9999 },
+                style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
               });
             }
           });
@@ -697,307 +697,318 @@ function GameBookEditorContent() {
   };
 
   return (
-    <div className="flex h-[80vh] w-full flex-col md:flex-row">
-      <div
-        className="h-full w-full border border-slate-200 rounded-lg overflow-hidden bg-slate-50"
-        ref={reactFlowWrapper}
-      >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={onNodeClick}
-          onEdgeClick={onEdgeClick}
-          onPaneClick={onPaneClick}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          deleteKeyCode={["Backspace", "Delete"]}
-          edgeUpdaterRadius={10}
-          onEdgeUpdate={(oldEdge, newConnection) => {
-            setEdges((els) =>
-              els.map((el) =>
-                el.id === oldEdge.id
-                  ? { ...el, ...newConnection, type: "custom" }
-                  : el
-              )
-            );
-          }}
-          onNodesDelete={onNodesDelete}
-          onEdgesDelete={onEdgesDelete}
-          nodesDraggable={true}
-          minZoom={0.1}
-          maxZoom={2}
-          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-          // Enable connecting to nodes by hovering over them
-          connectOnClick={false}
-          connectionRadius={40}
-          elevateEdgesOnSelect={true}
-          zindex={0} // This forces edges to be on top of nodes
-          proOptions={{ hideAttribution: true }}
+    <div className="flex h-[80vh] w-full flex-col">
+      {/* Barra dei comandi */}
+      <div className="flex gap-2 p-1 bg-white border-b border-slate-200">
+        <Button
+          onClick={addPageNode}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
         >
-          {/* Custom arrow marker definition */}
-          <svg style={{ position: "absolute", top: 0, left: 0 }}>
-            <defs>
-              <marker
-                id="arrow"
-                viewBox="0 0 10 10"
-                refX="8"
-                refY="5"
-                markerWidth="8"
-                markerHeight="8"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1" />
-              </marker>
-            </defs>
-          </svg>
-
-          <Controls className="bg-white border border-slate-200 rounded-md shadow-sm">
-            <button
-              className="react-flow__controls-button"
-              onClick={() => {
-                const startNode = nodes.find((node) => node.data.isStartNode);
-                if (startNode) {
-                  reactFlowInstance.setCenter(
-                    startNode.position.x,
-                    startNode.position.y,
-                    { duration: 800 }
-                  );
-                }
-              }}
-              title="Go to Start Page"
-            >
-              <BookOpen className="h-4 w-4" />
-            </button>
-          </Controls>
-          <MiniMap
-            nodeStrokeWidth={3}
-            zoomable
-            pannable
-            draggable
-            maskColor="rgba(0, 0, 0, 0.1)"
-            className="bg-white border border-slate-200 rounded-md shadow-sm"
-            nodeColor={(node) => {
-              if (node.type === "choice") return "#8b5cf6";
-              if (node.data.isStartNode) return "#10b981";
-              if (node.data.isEndNode) return "#f43f5e";
-              return "#6366f1";
-            }}
-          />
-          <Background gap={16} size={1} color="#e2e8f0" />
-          <Panel position="top-right">
-            <div className="flex gap-2 flex-wrap bg-white p-2 rounded-md shadow-sm border border-slate-200">
-              <Button
-                onClick={addPageNode}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
-              >
-                <BookOpen className="h-4 w-4" />
-                Add Page
-              </Button>
-              <Button
-                onClick={addEndPageNode}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-rose-50 hover:text-rose-600 border-slate-200"
-              >
-                <Flag className="h-4 w-4" />
-                Add End Page
-              </Button>
-              <Button
-                onClick={addChoiceNode}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-violet-50 hover:text-violet-600 border-slate-200"
-              >
-                <ArrowRightFromLine className="h-4 w-4" />
-                Add Choice
-              </Button>
-              <Button
-                onClick={exportToJson}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-              >
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
-              <Button
-                onClick={handleImportClick}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-              >
-                <Upload className="h-4 w-4" />
-                Import
-              </Button>
-              <Button
-                onClick={resetCanvas}
-                variant="outline"
-                className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Reset
-              </Button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={importJson}
-                accept=".json"
-                className="hidden"
-              />
-            </div>
-          </Panel>
-        </ReactFlow>
+          <BookOpen className="h-4 w-4" />
+          Add Page
+        </Button>
+        <Button
+          onClick={addEndPageNode}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-rose-50 hover:text-rose-600 border-slate-200"
+        >
+          <Flag className="h-4 w-4" />
+          Add End Page
+        </Button>
+        <Button
+          onClick={addChoiceNode}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-violet-50 hover:text-violet-600 border-slate-200"
+        >
+          <ArrowRightFromLine className="h-4 w-4" />
+          Add Choice
+        </Button>
+        <Button
+          onClick={exportToJson}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
+        >
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
+        <Button
+          onClick={handleImportClick}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
+        >
+          <Upload className="h-4 w-4" />
+          Import
+        </Button>
+        <Button
+          onClick={resetCanvas}
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-200"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Reset
+        </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={importJson}
+          accept=".json"
+          className="hidden"
+        />
       </div>
 
-      {selectedNode && (
-        <div className="w-full md:w-1/3 p-4 border-l border-slate-200 overflow-auto bg-white">
-          <h3 className="text-lg font-medium mb-4 text-slate-800">
-            Edit {selectedNode.type === "page" ? "Page" : "Choice"}
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700">
-                Title
-              </label>
-              <input
-                type="text"
-                value={nodeTitle}
-                onChange={handleTitleChange}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700">
-                Content
-              </label>
-              <RichTextEditor
-                content={nodeContent}
-                onChange={handleContentChange}
-              />
-              <Button
-                onClick={updateNodeData}
-                className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white"
-              >
-                Apply Changes
-              </Button>
-            </div>
+      {/* Area principale con canvas e pannello laterale */}
+      <div className="flex flex-1 overflow-hidden">
+        <div
+          className="h-full w-full border border-slate-200 rounded-lg overflow-hidden bg-slate-50"
+          ref={reactFlowWrapper}
+        >
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onNodeClick={onNodeClick}
+            onEdgeClick={onEdgeClick}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            deleteKeyCode={["Backspace", "Delete"]}
+            edgeUpdaterRadius={10}
+            onEdgeUpdate={(oldEdge, newConnection: Connection) => {
+              setEdges((els) =>
+                els.map((el) =>
+                  el.id === oldEdge.id
+                    ? {
+                        ...el,
+                        source: newConnection.source || el.source,
+                        target: newConnection.target || el.target,
+                        sourceHandle:
+                          newConnection.sourceHandle || el.sourceHandle,
+                        targetHandle:
+                          newConnection.targetHandle || el.targetHandle,
+                        type: "custom",
+                      }
+                    : el
+                )
+              );
+            }}
+            onNodesDelete={onNodesDelete}
+            onEdgesDelete={onEdgesDelete}
+            nodesDraggable={true}
+            minZoom={0.1}
+            maxZoom={2}
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+            // Enable connecting to nodes by hovering over them
+            connectOnClick={false}
+            connectionRadius={40}
+            elevateEdgesOnSelect={true}
+            proOptions={{ hideAttribution: true }}
+          >
+            {/* Custom arrow marker definition */}
+            <svg style={{ position: "absolute", top: 0, left: 0 }}>
+              <defs>
+                <marker
+                  id="arrow"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="8"
+                  markerHeight="8"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1" />
+                </marker>
+              </defs>
+            </svg>
 
-            {/* Image section */}
-            <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700">
-                Image
-              </label>
-              <div className="flex flex-col gap-2">
-                {nodeImage ? (
-                  <div className="relative border border-slate-200 rounded-md p-2">
-                    <img
-                      src={nodeImage || "/placeholder.svg"}
-                      alt="Node image"
-                      className="max-w-full max-h-[150px] object-contain mx-auto"
-                    />
-                    <Button
-                      onClick={handleImageDelete}
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
-                    <Image className="h-8 w-8 text-slate-400 mb-2" />
-                    <p className="text-sm text-slate-500 mb-2">
-                      No image uploaded
-                    </p>
-                    <Button
-                      onClick={triggerImageUpload}
-                      variant="outline"
-                      size="sm"
-                      className="bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
-                    >
-                      Upload Image
-                    </Button>
-                  </div>
-                )}
+            <Controls className="bg-white border border-slate-200 rounded-md shadow-sm">
+              <button
+                className="react-flow__controls-button"
+                onClick={() => {
+                  const startNode = nodes.find((node) => node.data.isStartNode);
+                  if (startNode) {
+                    reactFlowInstance.setCenter(
+                      startNode.position.x,
+                      startNode.position.y,
+                      { duration: 800 }
+                    );
+                  }
+                }}
+                title="Go to Start Page"
+              >
+                <BookOpen className="h-4 w-4" />
+              </button>
+            </Controls>
+            <MiniMap
+              nodeStrokeWidth={3}
+              zoomable
+              pannable
+              draggable
+              maskColor="rgba(0, 0, 0, 0.1)"
+              className="bg-white border border-slate-200 rounded-md shadow-sm"
+              nodeColor={(node) => {
+                if (node.type === "choice") return "#8b5cf6";
+                if (node.data.isStartNode) return "#10b981";
+                if (node.data.isEndNode) return "#f43f5e";
+                return "#6366f1";
+              }}
+            />
+            <Background gap={16} size={1} color="#e2e8f0" />
+          </ReactFlow>
+        </div>
+
+        {selectedNode && (
+          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 overflow-auto bg-white">
+            <h3 className="text-lg font-medium mb-4 text-slate-800">
+              Edit {selectedNode.type === "page" ? "Page" : "Choice"}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-slate-700">
+                  Title
+                </label>
                 <input
-                  type="file"
-                  ref={imageInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  className="hidden"
+                  type="text"
+                  value={nodeTitle}
+                  onChange={handleTitleChange}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                 />
               </div>
-            </div>
-
-            <div className="flex justify-between">
-              {!selectedNode.data.isStartNode && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-slate-700">
+                  Content
+                </label>
+                <RichTextEditor
+                  content={nodeContent}
+                  onChange={handleContentChange}
+                />
                 <Button
-                  onClick={() => deleteNode(selectedNode.id)}
+                  onClick={updateNodeData}
+                  className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  Apply Changes
+                </Button>
+              </div>
+
+              {/* Image section */}
+              <div>
+                <label className="block text-sm font-medium mb-1 text-slate-700">
+                  Image
+                </label>
+                <div className="flex flex-col gap-2">
+                  {nodeImage ? (
+                    <div className="relative border border-slate-200 rounded-md p-2">
+                      <img
+                        src={nodeImage || "/placeholder.svg"}
+                        alt="Node image"
+                        className="max-w-full max-h-[150px] object-contain mx-auto"
+                      />
+                      <Button
+                        onClick={handleImageDelete}
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
+                      <Image className="h-8 w-8 text-slate-400 mb-2" />
+                      <p className="text-sm text-slate-500 mb-2">
+                        No image uploaded
+                      </p>
+                      <Button
+                        onClick={triggerImageUpload}
+                        variant="outline"
+                        size="sm"
+                        className="bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
+                      >
+                        Upload Image
+                      </Button>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    ref={imageInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between">
+                {!selectedNode.data.isStartNode && (
+                  <Button
+                    onClick={() => deleteNode(selectedNode.id)}
+                    variant="destructive"
+                    className="mt-2 bg-rose-600 hover:bg-rose-700"
+                  >
+                    Delete Node
+                  </Button>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">
+                  Node ID: {selectedNode.id}
+                </p>
+                <p className="text-sm text-slate-500">
+                  Type: {selectedNode.type === "page" ? "Page" : "Choice"}
+                </p>
+                <p className="text-sm text-slate-500">
+                  Dimensions: {selectedNode.data.width}px ×{" "}
+                  {selectedNode.data.height}px
+                </p>
+                {selectedNode.data.isStartNode && (
+                  <p className="text-sm text-emerald-600 font-medium">
+                    This is the start page and cannot be deleted
+                  </p>
+                )}
+                {selectedNode.data.isEndNode && (
+                  <p className="text-sm text-rose-600 font-medium">
+                    This is an end page (no outgoing connections)
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedEdge && !selectedNode && (
+          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 bg-white">
+            <h3 className="text-lg font-medium mb-4 text-slate-800">
+              Edit Connection
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-slate-500">
+                  Connection ID: {selectedEdge.id}
+                </p>
+                <p className="text-sm text-slate-500">
+                  From: {selectedEdge.source}
+                </p>
+                <p className="text-sm text-slate-500">
+                  To: {selectedEdge.target}
+                </p>
+              </div>
+              <div>
+                <Button
+                  onClick={() => deleteEdge(selectedEdge.id)}
                   variant="destructive"
                   className="mt-2 bg-rose-600 hover:bg-rose-700"
                 >
-                  Delete Node
+                  Delete Connection
                 </Button>
-              )}
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">
-                Node ID: {selectedNode.id}
-              </p>
-              <p className="text-sm text-slate-500">
-                Type: {selectedNode.type === "page" ? "Page" : "Choice"}
-              </p>
-              <p className="text-sm text-slate-500">
-                Dimensions: {selectedNode.data.width}px ×{" "}
-                {selectedNode.data.height}px
-              </p>
-              {selectedNode.data.isStartNode && (
-                <p className="text-sm text-emerald-600 font-medium">
-                  This is the start page and cannot be deleted
-                </p>
-              )}
-              {selectedNode.data.isEndNode && (
-                <p className="text-sm text-rose-600 font-medium">
-                  This is an end page (no outgoing connections)
-                </p>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {selectedEdge && !selectedNode && (
-        <div className="w-full md:w-1/3 p-4 border-l border-slate-200 bg-white">
-          <h3 className="text-lg font-medium mb-4 text-slate-800">
-            Edit Connection
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-slate-500">
-                Connection ID: {selectedEdge.id}
-              </p>
-              <p className="text-sm text-slate-500">
-                From: {selectedEdge.source}
-              </p>
-              <p className="text-sm text-slate-500">
-                To: {selectedEdge.target}
-              </p>
-            </div>
-            <div>
-              <Button
-                onClick={() => deleteEdge(selectedEdge.id)}
-                variant="destructive"
-                className="mt-2 bg-rose-600 hover:bg-rose-700"
-              >
-                Delete Connection
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
