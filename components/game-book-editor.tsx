@@ -978,103 +978,124 @@ function GameBookEditorContent() {
         </div>
 
         {selectedNode && (
-          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 overflow-auto bg-white">
-            <h3 className="text-lg font-medium mb-4 text-slate-800">
-              Edit {selectedNode.type === "page" ? "Page" : "Choice"}
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={nodeTitle}
-                  onChange={handleTitleChange}
-                  onBlur={handleBlur}
-                  onKeyDown={handleKeyDown}
-                  className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
-                />
+          <div className="w-full md:w-1/3 flex flex-col border-l border-slate-200 bg-white">
+            <div className="flex-none p-4 border-b border-slate-200 bg-slate-50">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium text-slate-800">
+                  Edit {selectedNode.type === "page" ? "Page" : "Choice"}
+                </h3>
+                <Button
+                  onClick={() => {
+                    // Deseleziona il nodo cliccando sul pannello
+                    const pane = document.querySelector(".react-flow__pane");
+                    if (pane) {
+                      (pane as HTMLElement).click();
+                    }
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700">
-                  Content
-                </label>
-                <RichTextEditor
-                  content={nodeContent}
-                  onChange={handleContentChange}
-                />
-              </div>
+            </div>
 
-              {/* Image section */}
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700">
-                  Image
-                </label>
-                <div className="flex flex-col gap-2">
-                  {nodeImage ? (
-                    <div className="relative border border-slate-200 rounded-md p-2">
-                      <img
-                        src={nodeImage || "/placeholder.svg"}
-                        alt="Node image"
-                        className="max-w-full max-h-[150px] object-contain mx-auto"
-                      />
-                      <Button
-                        onClick={handleImageDelete}
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
-                      <Image className="h-8 w-8 text-slate-400 mb-2" />
-                      <p className="text-sm text-slate-500 mb-2">
-                        No image uploaded
-                      </p>
-                      <Button
-                        onClick={triggerImageUpload}
-                        variant="outline"
-                        size="sm"
-                        className="bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
-                      >
-                        Upload Image
-                      </Button>
-                    </div>
-                  )}
+            <div className="flex-1 overflow-auto p-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">
+                    Title
+                  </label>
                   <input
-                    type="file"
-                    ref={imageInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
+                    type="text"
+                    value={nodeTitle}
+                    onChange={handleTitleChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
                   />
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">
+                    Content
+                  </label>
+                  <RichTextEditor
+                    content={nodeContent}
+                    onChange={handleContentChange}
+                  />
+                </div>
 
-              <div>
-                <p className="text-sm text-slate-500">
-                  Node ID: {selectedNode.id}
-                </p>
-                <p className="text-sm text-slate-500">
-                  Type: {selectedNode.type === "page" ? "Page" : "Choice"}
-                </p>
-                <p className="text-sm text-slate-500">
-                  Dimensions: {selectedNode.data.width}px ×{" "}
-                  {selectedNode.data.height}px
-                </p>
-                {selectedNode.data.isStartNode && (
-                  <p className="text-sm text-emerald-600 font-medium">
-                    This is the start page and cannot be deleted
+                {/* Image section */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">
+                    Image
+                  </label>
+                  <div className="flex flex-col gap-2">
+                    {nodeImage ? (
+                      <div className="relative border border-slate-200 rounded-md p-2">
+                        <img
+                          src={nodeImage || "/placeholder.svg"}
+                          alt="Node image"
+                          className="max-w-full max-h-[150px] object-contain mx-auto"
+                        />
+                        <Button
+                          onClick={handleImageDelete}
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
+                        <Image className="h-8 w-8 text-slate-400 mb-2" />
+                        <p className="text-sm text-slate-500 mb-2">
+                          No image uploaded
+                        </p>
+                        <Button
+                          onClick={triggerImageUpload}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+                        >
+                          Upload Image
+                        </Button>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={imageInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Node ID: {selectedNode.id}
                   </p>
-                )}
-                {selectedNode.data.isEndNode && (
-                  <p className="text-sm text-rose-600 font-medium">
-                    This is an end page (no outgoing connections)
+                  <p className="text-sm text-slate-500">
+                    Type: {selectedNode.type === "page" ? "Page" : "Choice"}
                   </p>
-                )}
+                  <p className="text-sm text-slate-500">
+                    Dimensions: {selectedNode.data.width}px ×{" "}
+                    {selectedNode.data.height}px
+                  </p>
+                  {selectedNode.data.isStartNode && (
+                    <p className="text-sm text-emerald-600 font-medium">
+                      This is the start page and cannot be deleted
+                    </p>
+                  )}
+                  {selectedNode.data.isEndNode && (
+                    <p className="text-sm text-rose-600 font-medium">
+                      This is an end page (no outgoing connections)
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1102,80 +1123,88 @@ function GameBookEditorContent() {
         )}
 
         {isPlayMode && (
-          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 overflow-auto bg-white">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-slate-800">Play Mode</h3>
-              <Button
-                onClick={() => setIsPlayMode(false)}
-                variant="outline"
-                size="sm"
-                className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
-              >
-                <X className="h-4 w-4" />
-                Exit
-              </Button>
+          <div className="w-full md:w-1/3 flex flex-col border-l border-slate-200 bg-white">
+            <div className="flex-none p-4 border-b border-slate-200 bg-slate-50">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium text-slate-800">
+                  Play Mode
+                </h3>
+                <Button
+                  onClick={() => setIsPlayMode(false)}
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
-            {currentPageId && (
-              <div className="space-y-4">
-                <h4 className="text-xl font-semibold">
-                  {nodes.find((node) => node.id === currentPageId)?.data.title}
-                </h4>
-                {nodes.find((node) => node.id === currentPageId)?.data
-                  .image && (
-                  <div className="w-full overflow-hidden rounded-md">
-                    <img
-                      src={
-                        nodes.find((node) => node.id === currentPageId)?.data
-                          .image
-                      }
-                      alt="Page illustration"
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                )}
+            <div className="flex-1 overflow-auto p-4">
+              {currentPageId && (
                 <div className="space-y-4">
-                  <div
-                    className="prose max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        nodes.find((node) => node.id === currentPageId)?.data
-                          .content || "",
-                    }}
-                  />
+                  <h4 className="text-xl font-semibold">
+                    {
+                      nodes.find((node) => node.id === currentPageId)?.data
+                        .title
+                    }
+                  </h4>
+                  {nodes.find((node) => node.id === currentPageId)?.data
+                    .image && (
+                    <div className="w-full overflow-hidden rounded-md">
+                      <img
+                        src={
+                          nodes.find((node) => node.id === currentPageId)?.data
+                            .image
+                        }
+                        alt="Page illustration"
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-4">
+                    <div
+                      className="prose max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          nodes.find((node) => node.id === currentPageId)?.data
+                            .content || "",
+                      }}
+                    />
 
-                  <div className="space-y-2">
-                    {getAvailableChoices().map((choice) => {
-                      if (!choice) return null;
-                      const destinationPage = getDestinationPage(choice.id);
-                      return (
-                        <Button
-                          key={choice.id}
-                          onClick={() =>
-                            navigateToPage(destinationPage?.id || "")
-                          }
-                          className="w-full justify-start text-left bg-blue-200 hover:bg-blue-300 border border-slate-200 p-6"
-                        >
-                          <div className="flex flex-col items-start gap-1">
-                            <span className="font-semibold text-slate-800">
-                              {choice.data.title}
-                            </span>
-                            {choice.data.content && (
-                              <span
-                                className="text-xs text-slate-600"
-                                dangerouslySetInnerHTML={{
-                                  __html: choice.data.content,
-                                }}
-                              />
-                            )}
-                          </div>
-                        </Button>
-                      );
-                    })}
+                    <div className="space-y-2">
+                      {getAvailableChoices().map((choice) => {
+                        if (!choice) return null;
+                        const destinationPage = getDestinationPage(choice.id);
+                        return (
+                          <Button
+                            key={choice.id}
+                            onClick={() =>
+                              navigateToPage(destinationPage?.id || "")
+                            }
+                            className="w-full justify-start text-left bg-blue-200 hover:bg-blue-300 border border-slate-200 p-6"
+                          >
+                            <div className="flex flex-col items-start gap-1">
+                              <span className="font-semibold text-slate-800">
+                                {choice.data.title}
+                              </span>
+                              {choice.data.content && (
+                                <span
+                                  className="text-xs text-slate-600"
+                                  dangerouslySetInnerHTML={{
+                                    __html: choice.data.content,
+                                  }}
+                                />
+                              )}
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </div>
