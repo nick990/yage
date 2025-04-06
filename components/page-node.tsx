@@ -174,15 +174,24 @@ export const PageNode = memo(
           {/* Content area with FIXED height regardless of image */}
           <div
             ref={contentRef}
-            className="mt-3 text-xs text-slate-600 overflow-y-scroll prose prose-sm max-w-none node-content"
+            className="mt-3 text-xs text-slate-600 overflow-y-scroll prose prose-sm max-w-none node-content cursor-pointer"
             style={{
               height: "140px", // Fixed height for content area always
               paddingRight: "10px",
               overflowY: "scroll", // Always show scrollbar
               touchAction: "pan-y", // Permettiamo solo pan-y sui dispositivi touch
             }}
-            dangerouslySetInnerHTML={{ __html: data.content }}
-          />
+            onClick={(e) => {
+              e.stopPropagation();
+              // Simula il click sul nodo per aprire il sidebar
+              const nodeElement = nodeRef.current;
+              if (nodeElement) {
+                nodeElement.click();
+              }
+            }}
+          >
+            <div dangerouslySetInnerHTML={{ __html: data.content }} />
+          </div>
 
           {/* Display image if available in its own container - full width */}
           {data.image && (

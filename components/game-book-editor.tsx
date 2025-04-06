@@ -158,7 +158,7 @@ export default function GameBookEditor() {
 function GameBookEditorContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const [nodeTitle, setNodeTitle] = useState("");
   const [nodeContent, setNodeContent] = useState("");
@@ -167,6 +167,9 @@ function GameBookEditorContent() {
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Trova il nodo selezionato
+  const selectedNode = nodes.find((node) => node.selected) || null;
 
   // Memoize edgeTypes
   const memoizedEdgeTypes = useMemo(
@@ -222,14 +225,12 @@ function GameBookEditorContent() {
 
   // Handle node selection
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node);
     setSelectedEdge(null);
   };
 
   // Handle edge selection
   const onEdgeClick = (_: React.MouseEvent, edge: Edge) => {
     setSelectedEdge(edge);
-    setSelectedNode(null);
   };
 
   // Add a new page node
@@ -318,8 +319,6 @@ function GameBookEditorContent() {
               image: nodeImage,
             },
           };
-          // Also update the selected node reference
-          setSelectedNode(updatedNode);
           return updatedNode;
         }
         return node;
@@ -342,7 +341,6 @@ function GameBookEditorContent() {
                 title: newTitle,
               },
             };
-            setSelectedNode(updatedNode);
             return updatedNode;
           }
           return node;
@@ -365,7 +363,6 @@ function GameBookEditorContent() {
                 content: content,
               },
             };
-            setSelectedNode(updatedNode);
             return updatedNode;
           }
           return node;
@@ -402,8 +399,6 @@ function GameBookEditorContent() {
                   image: base64String,
                 },
               };
-              // Also update the selected node reference
-              setSelectedNode(updatedNode);
               return updatedNode;
             }
             return node;
@@ -435,8 +430,6 @@ function GameBookEditorContent() {
                 image: null,
               },
             };
-            // Also update the selected node reference
-            setSelectedNode(updatedNode);
             return updatedNode;
           }
           return node;
@@ -465,7 +458,6 @@ function GameBookEditorContent() {
 
   // Handle pane click to deselect nodes and edges
   const onPaneClick = () => {
-    setSelectedNode(null);
     setSelectedEdge(null);
   };
 
@@ -478,7 +470,6 @@ function GameBookEditorContent() {
     ) {
       setNodes(initialNodes);
       setEdges(initialEdges);
-      setSelectedNode(null);
       setSelectedEdge(null);
     }
   };
