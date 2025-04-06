@@ -39,6 +39,7 @@ import {
   File,
   ChevronDown,
   Share2,
+  Play,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -167,9 +168,14 @@ function GameBookEditorContent() {
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isPlayMode, setIsPlayMode] = useState(false);
+  const [currentPageId, setCurrentPageId] = useState<string | null>(null);
 
   // Trova il nodo selezionato
   const selectedNode = nodes.find((node) => node.selected) || null;
+
+  // Trova la pagina iniziale
+  const startPage = nodes.find((node) => node.data.isStartNode);
 
   // Memoize edgeTypes
   const memoizedEdgeTypes = useMemo(
@@ -736,6 +742,49 @@ function GameBookEditorContent() {
     }
   };
 
+  // Inizia il play mode
+  const startPlayMode = () => {
+    if (startPage) {
+      setCurrentPageId(startPage.id);
+      setIsPlayMode(true);
+    }
+  };
+
+  // Gestisce la navigazione tra le pagine
+  const navigateToPage = (targetNodeId: string) => {
+    setCurrentPageId(targetNodeId);
+    // Scroll to top
+    const sidebar = document.querySelector(".overflow-auto");
+    if (sidebar) {
+      sidebar.scrollTop = 0;
+    }
+  };
+
+  // Trova le scelte disponibili per la pagina corrente
+  const getAvailableChoices = () => {
+    if (!currentPageId) return [];
+
+    const currentPage = nodes.find((node) => node.id === currentPageId);
+    if (!currentPage) return [];
+
+    // Trova tutti i nodi choice collegati a questa pagina
+    const choiceEdges = edges.filter((edge) => edge.source === currentPageId);
+    return choiceEdges
+      .map((edge) => {
+        const choiceNode = nodes.find((node) => node.id === edge.target);
+        return choiceNode;
+      })
+      .filter(Boolean);
+  };
+
+  // Trova la pagina di destinazione per una scelta
+  const getDestinationPage = (choiceId: string) => {
+    const choiceEdge = edges.find((edge) => edge.source === choiceId);
+    if (!choiceEdge) return null;
+
+    return nodes.find((node) => node.id === choiceEdge.target);
+  };
+
   return (
     <div className="flex h-[80vh] w-full flex-col">
       {/* Barra dei comandi */}
@@ -744,7 +793,7 @@ function GameBookEditorContent() {
           onClick={addPageNode}
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-white hover:bg-indigo-50 hover:text-indigo-600 border-slate-200"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
         >
           <BookOpen className="h-4 w-4" />
           Add Page
@@ -753,7 +802,7 @@ function GameBookEditorContent() {
           onClick={addEndPageNode}
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-white hover:bg-rose-50 hover:text-rose-600 border-slate-200"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
         >
           <Flag className="h-4 w-4" />
           Add End Page
@@ -762,10 +811,19 @@ function GameBookEditorContent() {
           onClick={addChoiceNode}
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-white hover:bg-violet-50 hover:text-violet-600 border-slate-200"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
         >
           <ArrowRightFromLine className="h-4 w-4" />
           Add Choice
+        </Button>
+        <Button
+          onClick={startPlayMode}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+        >
+          <Play className="h-4 w-4" />
+          Play
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1040,6 +1098,84 @@ function GameBookEditorContent() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {isPlayMode && (
+          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 overflow-auto bg-white">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-slate-800">Play Mode</h3>
+              <Button
+                onClick={() => setIsPlayMode(false)}
+                variant="outline"
+                size="sm"
+                className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+              >
+                <X className="h-4 w-4" />
+                Exit
+              </Button>
+            </div>
+
+            {currentPageId && (
+              <div className="space-y-4">
+                <h4 className="text-xl font-semibold">
+                  {nodes.find((node) => node.id === currentPageId)?.data.title}
+                </h4>
+                {nodes.find((node) => node.id === currentPageId)?.data
+                  .image && (
+                  <div className="w-full overflow-hidden rounded-md">
+                    <img
+                      src={
+                        nodes.find((node) => node.id === currentPageId)?.data
+                          .image
+                      }
+                      alt="Page illustration"
+                      className="w-full h-auto object-contain"
+                    />
+                  </div>
+                )}
+                <div className="space-y-4">
+                  <div
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        nodes.find((node) => node.id === currentPageId)?.data
+                          .content || "",
+                    }}
+                  />
+
+                  <div className="space-y-2">
+                    {getAvailableChoices().map((choice) => {
+                      if (!choice) return null;
+                      const destinationPage = getDestinationPage(choice.id);
+                      return (
+                        <Button
+                          key={choice.id}
+                          onClick={() =>
+                            navigateToPage(destinationPage?.id || "")
+                          }
+                          className="w-full justify-start text-left bg-blue-200 hover:bg-blue-300 border border-slate-200 p-6"
+                        >
+                          <div className="flex flex-col items-start gap-1">
+                            <span className="font-semibold text-slate-800">
+                              {choice.data.title}
+                            </span>
+                            {choice.data.content && (
+                              <span
+                                className="text-xs text-slate-600"
+                                dangerouslySetInnerHTML={{
+                                  __html: choice.data.content,
+                                }}
+                              />
+                            )}
+                          </div>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
