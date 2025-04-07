@@ -40,6 +40,7 @@ import {
   ChevronDown,
   Share2,
   Play,
+  Square,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -836,13 +837,17 @@ function GameBookEditorContent() {
           Add Choice
         </Button>
         <Button
-          onClick={startPlayMode}
+          onClick={isPlayMode ? () => setIsPlayMode(false) : startPlayMode}
           variant="outline"
           size="sm"
           className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
         >
-          <Play className="h-4 w-4" />
-          Play
+          {isPlayMode ? (
+            <Square className="h-4 w-4" />
+          ) : (
+            <Play className="h-4 w-4" />
+          )}
+          {isPlayMode ? "Stop" : "Play"}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1160,7 +1165,7 @@ function GameBookEditorContent() {
                   size="sm"
                   className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
                 >
-                  <X className="h-4 w-4" />
+                  <Square className="h-4 w-4" />
                 </Button>
               </div>
             </div>
