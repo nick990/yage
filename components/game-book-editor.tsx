@@ -884,7 +884,13 @@ function GameBookEditorContent() {
           ref={reactFlowWrapper}
         >
           <ReactFlow
-            nodes={nodes}
+            nodes={nodes.map((node) => ({
+              ...node,
+              data: {
+                ...node.data,
+                isCurrentPage: isPlayMode && node.id === currentPageId,
+              },
+            }))}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}

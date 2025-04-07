@@ -8,7 +8,12 @@ import { BookOpen, Trash2, Flag } from "lucide-react";
 
 // Update the PageNode to display an image if available and adjust height accordingly
 export const PageNode = memo(
-  ({ data, isConnectable, id, selected }: NodeProps) => {
+  ({
+    data,
+    isConnectable,
+    id,
+    selected,
+  }: NodeProps & { data: { isCurrentPage?: boolean } }) => {
     const { setNodes, setEdges } = useReactFlow();
     const nodeRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -112,18 +117,16 @@ export const PageNode = memo(
     return (
       <div
         ref={nodeRef}
-        className={`shadow-lg rounded-md border ${
-          selected
-            ? "border-indigo-400 ring-2 ring-indigo-200"
-            : "border-slate-200"
-        } bg-white`}
+        className={`shadow-lg rounded-md border-2 ${
+          data.isCurrentPage ? "bg-yellow-50" : ""
+        } ${selected ? "ring-2 ring-red-200" : ""} bg-white`}
         style={{
           width: `${width}px`,
-          height: height, // Use "auto" for nodes with images
+          height: height,
           position: "relative",
           padding: "12px",
           overflow: "hidden",
-          minHeight: `${baseHeight}px`, // Garantisce un'altezza minima
+          minHeight: `${baseHeight}px`,
         }}
       >
         <div className="flex items-center justify-between">
