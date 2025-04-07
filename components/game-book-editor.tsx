@@ -747,6 +747,14 @@ function GameBookEditorContent() {
     if (startPage) {
       setCurrentPageId(startPage.id);
       setIsPlayMode(true);
+
+      // Centra la vista sulla pagina iniziale
+      const { zoom } = reactFlowInstance.getViewport();
+      reactFlowInstance.setCenter(
+        startPage.position.x,
+        startPage.position.y + 200,
+        { duration: 800, zoom }
+      );
     }
   };
 
@@ -757,6 +765,17 @@ function GameBookEditorContent() {
     const sidebar = document.querySelector(".overflow-auto");
     if (sidebar) {
       sidebar.scrollTop = 0;
+    }
+
+    // Centra la vista sul nodo corrente mantenendo lo zoom
+    const targetNode = nodes.find((node) => node.id === targetNodeId);
+    if (targetNode) {
+      const { zoom } = reactFlowInstance.getViewport();
+      reactFlowInstance.setCenter(
+        targetNode.position.x,
+        targetNode.position.y + 200,
+        { duration: 800, zoom }
+      );
     }
   };
 
