@@ -175,6 +175,8 @@ function GameBookEditorContent() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isPlayMode, setIsPlayMode] = useState(false);
   const [currentPageId, setCurrentPageId] = useState<string | null>(null);
+  const [isCharactersSidebarVisible, setIsCharactersSidebarVisible] =
+    useState(false);
 
   // Trova il nodo selezionato
   const selectedNode = nodes.find((node) => node.selected) || null;
@@ -809,6 +811,10 @@ function GameBookEditorContent() {
     return nodes.find((node) => node.id === choiceEdge.target);
   };
 
+  function handleCharactersClick() {
+    setIsCharactersSidebarVisible((prev) => !prev); // Toggle visibility
+  }
+
   return (
     <div className="flex h-[80vh] w-full flex-col">
       {/* Barra dei comandi */}
@@ -854,11 +860,7 @@ function GameBookEditorContent() {
           {isPlayMode ? "Stop" : "Play"}
         </Button>
         <Button
-          onClick={() => {
-            setSelectedNodeId(null);
-            setSelectedEdge(null);
-            setIsPlayMode(false);
-          }}
+          onClick={handleCharactersClick}
           variant="outline"
           size="sm"
           className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
@@ -1024,12 +1026,14 @@ function GameBookEditorContent() {
         </div>
 
         {/* Sidebar dei personaggi */}
-        <CharactersSidebar
-          characters={characters}
-          onCharactersChange={(updatedCharacters) => {
-            setCharacters(updatedCharacters);
-          }}
-        />
+        {isCharactersSidebarVisible && (
+          <CharactersSidebar
+            characters={characters}
+            onCharactersChange={(updatedCharacters) => {
+              setCharacters(updatedCharacters);
+            }}
+          />
+        )}
 
         {selectedNode && (
           <div className="w-full md:w-1/3 flex flex-col border-l border-slate-200 bg-white">
