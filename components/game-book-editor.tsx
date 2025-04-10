@@ -552,7 +552,7 @@ function GameBookEditorContent() {
     const gameBookData = {
       nodes: processedNodes,
       edges: edges,
-      characters: characters, // Add characters to the serialized data
+      characters: characters,
     };
 
     const jsonString = JSON.stringify(gameBookData, null, 2);
@@ -631,6 +631,7 @@ function GameBookEditorContent() {
     const gameBookData = {
       pages,
       choices,
+      characters,
     };
 
     const jsonString = JSON.stringify(gameBookData, null, 2);
