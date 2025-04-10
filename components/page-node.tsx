@@ -26,10 +26,9 @@ export const PageNode = memo(
 
     // Calcolo base dell'altezza senza immagine
     let baseHeight = headerHeight + contentHeight + padding;
-
     // Impostiamo una altezza minima, ma lasciamo che React-Flow gestisca
     // l'altezza totale in base al contenuto se c'è un'immagine
-    const height = data.image ? "auto" : `${baseHeight}px`;
+    const height = data.image || data.character ? "auto" : `${baseHeight}px`;
 
     // Function to handle node deletion
     const handleDelete = (event: React.MouseEvent) => {
@@ -174,30 +173,33 @@ export const PageNode = memo(
         </div>
 
         <div className="flex flex-col">
-          {/* Content area with FIXED height regardless of image */}
+          {/* Content area */}
           <div
             ref={contentRef}
             className="mt-3 text-xs text-slate-600 overflow-y-scroll prose prose-sm max-w-none node-content cursor-pointer"
             style={{
-              height: "140px", // Fixed height for content area always
+              height: "140px",
               paddingRight: "10px",
-              overflowY: "scroll", // Always show scrollbar
-              touchAction: "pan-y", // Permettiamo solo pan-y sui dispositivi touch
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              // Simula il click sul nodo per aprire il sidebar
-              const nodeElement = nodeRef.current;
-              if (nodeElement) {
-                nodeElement.click();
-              }
+              overflowY: "scroll",
+              touchAction: "pan-y",
             }}
           >
             <div dangerouslySetInnerHTML={{ __html: data.content }} />
           </div>
 
-          {/* Display image if available in its own container - full width */}
-          {data.image && (
+          {/* Display character image if a character is associated */}
+          {data.character && data.character.image && (
+            <div className="mt-3 mb-1 w-full">
+              <img
+                src={data.character.image || "/placeholder.svg"}
+                alt={`Character for ${data.character.name}`}
+                className="w-full h-auto object-cover rounded border border-slate-200"
+              />
+            </div>
+          )}
+
+          {/* Display page image if no character is associated */}
+          {!data.character && data.image && (
             <div className="mt-3 mb-1 w-full">
               <img
                 src={data.image || "/placeholder.svg"}

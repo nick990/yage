@@ -169,6 +169,7 @@ function GameBookEditorContent() {
   const [nodeContent, setNodeContent] = useState("");
   const [nodeImage, setNodeImage] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [nodeCharacter, setNodeCharacter] = useState<Character | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -198,8 +199,9 @@ function GameBookEditorContent() {
       setNodeTitle(selectedNode.data.title || "");
       setNodeContent(selectedNode.data.content || "");
       setNodeImage(selectedNode.data.image || null);
+      setNodeCharacter(selectedNode.data.character || null);
     }
-  }, [selectedNode]);
+  }, [selectedNode, characters]);
 
   // Handle connections between nodes
   const onConnect = useCallback(
@@ -330,6 +332,7 @@ function GameBookEditorContent() {
               title: nodeTitle,
               content: nodeContent,
               image: nodeImage,
+              character: nodeCharacter,
             },
           };
           return updatedNode;
@@ -691,7 +694,7 @@ function GameBookEditorContent() {
         const importedEdges = jsonData.edges.map((edge: Edge) => ({
           ...edge,
           type: "custom",
-          style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
+          style: { stroke: "#636f1", strokeWidth: 2.5, zIndex: 9999 },
         }));
 
         // Update the canvas with imported data
@@ -788,6 +791,34 @@ function GameBookEditorContent() {
   function handleCharactersClick() {
     setIsCharactersSidebarVisible((prev) => !prev); // Toggle visibility
   }
+
+  const handleCharacterChange = (characterId: string) => {
+    console.log("Selected character ID:", characterId);
+
+    const selectedCharacter = characters.find(
+      (char) => char.id === characterId
+    );
+    console.log("Selected character:", selectedCharacter);
+    setNodeCharacter(selectedCharacter!);
+
+    if (selectedNode) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                character: selectedCharacter,
+                image: selectedCharacter ? null : node.data.image, // Rimuovi l'immagine se c'è un character
+              },
+            };
+          }
+          return node;
+        })
+      );
+    }
+  };
 
   return (
     <div className="flex h-[80vh] w-full flex-col">
@@ -901,13 +932,15 @@ function GameBookEditorContent() {
           ref={reactFlowWrapper}
         >
           <ReactFlow
-            nodes={nodes.map((node) => ({
-              ...node,
-              data: {
-                ...node.data,
-                isCurrentPage: isPlayMode && node.id === currentPageId,
-              },
-            }))}
+            nodes={nodes.map((node) => {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  isCurrentPage: isPlayMode && node.id === currentPageId,
+                },
+              };
+            })}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -919,84 +952,7 @@ function GameBookEditorContent() {
             edgeTypes={memoizedEdgeTypes}
             deleteKeyCode={["Backspace", "Delete"]}
             edgeUpdaterRadius={10}
-            onEdgeUpdate={(oldEdge, newConnection: Connection) => {
-              setEdges((els) =>
-                els.map((el) =>
-                  el.id === oldEdge.id
-                    ? {
-                        ...el,
-                        source: newConnection.source || el.source,
-                        target: newConnection.target || el.target,
-                        sourceHandle:
-                          newConnection.sourceHandle || el.sourceHandle,
-                        targetHandle:
-                          newConnection.targetHandle || el.targetHandle,
-                        type: "custom",
-                      }
-                    : el
-                )
-              );
-            }}
-            nodesDraggable={true}
-            minZoom={0.1}
-            maxZoom={2}
-            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-            connectOnClick={false}
-            connectionRadius={40}
-            elevateEdgesOnSelect={true}
-            proOptions={{ hideAttribution: true }}
-          >
-            {/* Custom arrow marker definition */}
-            <svg style={{ position: "absolute", top: 0, left: 0 }}>
-              <defs>
-                <marker
-                  id="arrow"
-                  viewBox="0 0 10 10"
-                  refX="8"
-                  refY="5"
-                  markerWidth="8"
-                  markerHeight="8"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1" />
-                </marker>
-              </defs>
-            </svg>
-
-            <Controls className="bg-white border border-slate-200 rounded-md shadow-sm">
-              <button
-                className="react-flow__controls-button"
-                onClick={() => {
-                  const startNode = nodes.find((node) => node.data.isStartNode);
-                  if (startNode) {
-                    reactFlowInstance.setCenter(
-                      startNode.position.x,
-                      startNode.position.y,
-                      { duration: 800 }
-                    );
-                  }
-                }}
-                title="Go to Start Page"
-              >
-                <BookOpen className="h-4 w-4" />
-              </button>
-            </Controls>
-            <MiniMap
-              nodeStrokeWidth={3}
-              zoomable
-              pannable
-              draggable
-              maskColor="rgba(0, 0, 0, 0.1)"
-              className="bg-white border border-slate-200 rounded-md shadow-sm"
-              nodeColor={(node) => {
-                if (node.type === "choice") return "#8b5cf6";
-                if (node.data.isStartNode) return "#10b981";
-                if (node.data.isEndNode) return "#f43f5e";
-                return "#6366f1";
-              }}
-            />
-            <Background gap={16} size={1} color="#e2e8f0" />
-          </ReactFlow>
+          />
         </div>
 
         {/* Sidebar dei personaggi */}
@@ -1104,6 +1060,25 @@ function GameBookEditorContent() {
                       className="hidden"
                     />
                   </div>
+                </div>
+
+                {/* Character selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">
+                    Character
+                  </label>
+                  <select
+                    value={nodeCharacter?.id || ""}
+                    onChange={(e) => handleCharacterChange(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
+                  >
+                    <option value="">No Character</option>
+                    {characters.map((character) => (
+                      <option key={character.id} value={character.id}>
+                        {character.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
