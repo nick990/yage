@@ -687,48 +687,11 @@ function GameBookEditorContent() {
         }));
 
         // Process imported edges
-        let importedEdges: Edge[] = [];
-
-        // If the JSON has edges, use them directly
-        if (jsonData.edges && Array.isArray(jsonData.edges)) {
-          importedEdges = jsonData.edges.map((edge: Edge) => ({
-            ...edge,
-            type: "custom",
-            style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
-          }));
-        }
-        // Otherwise, reconstruct edges from the denormalized structure
-        else {
-          // Create edges from page choices
-          jsonData.nodes.forEach((node: any) => {
-            if (
-              node.type === "page" &&
-              node.choices &&
-              Array.isArray(node.choices)
-            ) {
-              node.choices.forEach((choiceId: string) => {
-                importedEdges.push({
-                  id: `e-${node.id}-${choiceId}`,
-                  source: node.id,
-                  target: choiceId,
-                  type: "custom",
-                  style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
-                });
-              });
-            }
-
-            // Create edges from choice destinations
-            if (node.type === "choice" && node.destination) {
-              importedEdges.push({
-                id: `e-${node.id}-${node.destination}`,
-                source: node.id,
-                target: node.destination,
-                type: "custom",
-                style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
-              });
-            }
-          });
-        }
+        const importedEdges = jsonData.edges.map((edge: Edge) => ({
+          ...edge,
+          type: "custom",
+          style: { stroke: "#6366f1", strokeWidth: 2.5, zIndex: 9999 },
+        }));
 
         // Update the canvas with imported data
         setNodes(importedNodes);
