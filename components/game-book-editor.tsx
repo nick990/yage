@@ -41,6 +41,7 @@ import {
   Share2,
   Play,
   Square,
+  Users,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -49,6 +50,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CharactersSidebar } from "./characters-sidebar";
+import { Character } from "@/models/character";
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -165,6 +168,7 @@ function GameBookEditorContent() {
   const [nodeTitle, setNodeTitle] = useState("");
   const [nodeContent, setNodeContent] = useState("");
   const [nodeImage, setNodeImage] = useState<string | null>(null);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -849,6 +853,19 @@ function GameBookEditorContent() {
           )}
           {isPlayMode ? "Stop" : "Play"}
         </Button>
+        <Button
+          onClick={() => {
+            setSelectedNodeId(null);
+            setSelectedEdge(null);
+            setIsPlayMode(false);
+          }}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+        >
+          <Users className="h-4 w-4" />
+          Characters
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -948,7 +965,6 @@ function GameBookEditorContent() {
             minZoom={0.1}
             maxZoom={2}
             defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-            // Enable connecting to nodes by hovering over them
             connectOnClick={false}
             connectionRadius={40}
             elevateEdgesOnSelect={true}
@@ -1006,6 +1022,14 @@ function GameBookEditorContent() {
             <Background gap={16} size={1} color="#e2e8f0" />
           </ReactFlow>
         </div>
+
+        {/* Sidebar dei personaggi */}
+        <CharactersSidebar
+          characters={characters}
+          onCharactersChange={(updatedCharacters) => {
+            setCharacters(updatedCharacters);
+          }}
+        />
 
         {selectedNode && (
           <div className="w-full md:w-1/3 flex flex-col border-l border-slate-200 bg-white">
