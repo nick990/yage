@@ -552,6 +552,7 @@ function GameBookEditorContent() {
     const gameBookData = {
       nodes: processedNodes,
       edges: edges,
+      characters: characters, // Add characters to the serialized data
     };
 
     const jsonString = JSON.stringify(gameBookData, null, 2);
@@ -659,6 +660,15 @@ function GameBookEditorContent() {
         if (!jsonData.nodes || !Array.isArray(jsonData.nodes)) {
           throw new Error("Invalid JSON format: missing nodes array");
         }
+        if (!jsonData.edges || !Array.isArray(jsonData.edges)) {
+          throw new Error("Invalid JSON format: missing edges array");
+        }
+        if (!jsonData.characters || !Array.isArray(jsonData.characters)) {
+          throw new Error("Invalid JSON format: missing characters array");
+        }
+
+        // Set characters
+        setCharacters(jsonData.characters);
 
         // Process imported nodes
         const importedNodes = jsonData.nodes.map((node: any) => ({
