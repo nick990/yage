@@ -608,6 +608,7 @@ function GameBookEditorContent() {
         image: node.data.image,
         isStartNode: node.data.isStartNode,
         isEndNode: node.data.isEndNode,
+        characterId: node.data.character?.id,
         incomingChoices:
           incomingEdgesMap
             .get(node.id)
@@ -626,6 +627,7 @@ function GameBookEditorContent() {
         title: node.data.title,
         content: node.data.content,
         image: node.data.image,
+        characterId: node.data.character?.id,
         incomingPages:
           incomingEdgesMap
             .get(node.id)
