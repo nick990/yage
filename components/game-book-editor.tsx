@@ -986,6 +986,7 @@ function GameBookEditorContent() {
             onCharactersChange={(updatedCharacters) => {
               setCharacters(updatedCharacters);
             }}
+            onClose={() => setIsCharactersSidebarVisible(false)}
           />
         )}
 

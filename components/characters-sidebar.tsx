@@ -2,16 +2,18 @@ import { useState } from "react";
 import { Character, createCharacter } from "@/models/character";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Image, Plus, Trash2 } from "lucide-react";
+import { Image, Plus, Trash2, X } from "lucide-react";
 
 interface CharactersSidebarProps {
   characters: Character[];
   onCharactersChange: (characters: Character[]) => void;
+  onClose: () => void;
 }
 
 export function CharactersSidebar({
   characters,
   onCharactersChange,
+  onClose,
 }: CharactersSidebarProps) {
   const [newCharacterName, setNewCharacterName] = useState("");
 
@@ -42,7 +44,17 @@ export function CharactersSidebar({
 
   return (
     <div className="w-64 h-full border-l border-gray-200 p-4 flex flex-col">
-      <h2 className="text-lg font-semibold mb-4">Personaggi</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Personaggi</h2>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
 
       <div className="flex gap-2 mb-4">
         <Input
