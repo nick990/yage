@@ -512,6 +512,11 @@ function GameBookEditorContent() {
         nodeData.image = node.data.image;
       }
 
+      // Add character ID if present
+      if (node.data.character) {
+        nodeData.characterId = node.data.character.id;
+      }
+
       // Add special node flags if present
       if (node.data.isStartNode) {
         nodeData.isStartNode = true;
@@ -674,21 +679,38 @@ function GameBookEditorContent() {
         // Set characters
         setCharacters(jsonData.characters);
 
+        // Create a map of characters by ID for quick lookup
+        const charactersMap = new Map(
+          jsonData.characters.map((char: Character) => [char.id, char])
+        );
+
         // Process imported nodes
-        const importedNodes = jsonData.nodes.map((node: any) => ({
-          id: node.id,
-          type: node.type,
-          position: node.position,
-          data: {
-            title: node.title,
-            content: node.content || "<p>No content</p>",
-            width: node.width || (node.type === "page" ? 360 : 250),
-            height: node.height || (node.type === "page" ? 200 : 150),
-            isStartNode: node.isStartNode || false,
-            isEndNode: node.isEndNode || false,
-            image: node.image || null,
-          },
-        }));
+        const importedNodes = jsonData.nodes.map((node: any) => {
+          const nodeData: any = {
+            id: node.id,
+            type: node.type,
+            position: node.position,
+            data: {
+              title: node.title,
+              content: node.content || "<p>No content</p>",
+              width: node.width || (node.type === "page" ? 360 : 250),
+              height: node.height || (node.type === "page" ? 200 : 150),
+              isStartNode: node.isStartNode || false,
+              isEndNode: node.isEndNode || false,
+              image: node.image || null,
+            },
+          };
+
+          // If the node has a characterId, find and assign the corresponding character object
+          if (node.characterId) {
+            const character = charactersMap.get(node.characterId);
+            if (character) {
+              nodeData.data.character = character;
+            }
+          }
+
+          return nodeData;
+        });
 
         // Process imported edges
         const importedEdges = jsonData.edges.map((edge: Edge) => ({
