@@ -193,8 +193,11 @@ export const PageNode = memo(
               <img
                 src={data.character.image || "/placeholder.svg"}
                 alt={`Character for ${data.character.name}`}
-                className="w-full h-auto object-cover rounded border border-slate-200"
+                className="w-full h-auto object-cover "
               />
+              <div className="bg-gray-800 px-3 py-2 text-l font-bold text-center text-white ">
+                {data.character.name}
+              </div>
             </div>
           )}
 
