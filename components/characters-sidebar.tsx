@@ -43,36 +43,38 @@ export function CharactersSidebar({
   };
 
   return (
-    <div className="w-64 h-full border-l border-gray-200 p-4 flex flex-col flex-shrink-0">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Personaggi</h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-8 w-8"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+    <div className="w-64 h-full border-l border-slate-200 flex flex-col flex-shrink-0">
+      <div className="flex-none p-4 border-b border-slate-200 bg-slate-50">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium text-slate-800">Personaggi</h3>
+          <Button
+            onClick={onClose}
+            variant="outline"
+            size="sm"
+            className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex gap-2 mb-4">
-        <Input
-          value={newCharacterName}
-          onChange={(e) => setNewCharacterName(e.target.value)}
-          placeholder="Nome personaggio"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleAddCharacter();
-            }
-          }}
-        />
-        <Button onClick={handleAddCharacter} size="icon">
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      <div className="flex-1 overflow-auto p-4">
+        <div className="flex gap-2 mb-4">
+          <Input
+            value={newCharacterName}
+            onChange={(e) => setNewCharacterName(e.target.value)}
+            placeholder="Nome personaggio"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddCharacter();
+              }
+            }}
+          />
+          <Button onClick={handleAddCharacter} size="icon">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
 
-      <div className="flex-1 overflow-auto">
         {characters.map((character) => (
           <div
             key={character.id}
