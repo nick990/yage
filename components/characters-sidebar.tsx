@@ -42,7 +42,7 @@ export function CharactersSidebar({
 
     if (
       window.confirm(
-        `Sei sicuro di voler eliminare il personaggio "${character.name}"?`
+        `Are you sure you want to delete the character "${character.name}"?`
       )
     ) {
       onCharactersChange(characters.filter((char) => char.id !== id));
@@ -106,7 +106,7 @@ export function CharactersSidebar({
     <div className="w-64 h-full border-l border-slate-200 flex flex-col flex-shrink-0">
       <div className="flex-none p-4 border-b border-slate-200 bg-slate-50">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium text-slate-800">Personaggi</h3>
+          <h3 className="text-lg font-medium text-slate-800">Characters</h3>
           <Button
             onClick={onClose}
             variant="outline"
@@ -123,7 +123,7 @@ export function CharactersSidebar({
           <Input
             value={newCharacterName}
             onChange={(e) => setNewCharacterName(e.target.value)}
-            placeholder="Nome personaggio"
+            placeholder="Name"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleAddCharacter();
@@ -162,7 +162,7 @@ export function CharactersSidebar({
                     <Input
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      placeholder="Nome personaggio"
+                      placeholder="Name"
                       className="flex-1 text-sm"
                     />
                   </div>
