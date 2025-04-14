@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Character, createCharacter } from "@/models/character";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Image, Plus, Trash2, X } from "lucide-react";
+import { Image, Plus, Trash2, X, Pencil } from "lucide-react";
 
 interface CharactersSidebarProps {
   characters: Character[];
@@ -16,6 +16,10 @@ export function CharactersSidebar({
   onClose,
 }: CharactersSidebarProps) {
   const [newCharacterName, setNewCharacterName] = useState("");
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(
+    null
+  );
+  const [editName, setEditName] = useState("");
 
   const handleAddCharacter = () => {
     if (newCharacterName.trim()) {
@@ -27,6 +31,9 @@ export function CharactersSidebar({
 
   const handleDeleteCharacter = (id: string) => {
     onCharactersChange(characters.filter((char) => char.id !== id));
+    if (editingCharacter?.id === id) {
+      setEditingCharacter(null);
+    }
   };
 
   const handleImageUpload = (id: string, file: File) => {
@@ -40,6 +47,30 @@ export function CharactersSidebar({
       );
     };
     reader.readAsDataURL(file);
+  };
+
+  const startEditing = (character: Character) => {
+    setEditingCharacter(character);
+    setEditName(character.name);
+  };
+
+  const saveEditing = () => {
+    if (editingCharacter && editName.trim()) {
+      onCharactersChange(
+        characters.map((char) =>
+          char.id === editingCharacter.id
+            ? { ...char, name: editName.trim() }
+            : char
+        )
+      );
+      setEditingCharacter(null);
+      setEditName("");
+    }
+  };
+
+  const cancelEditing = () => {
+    setEditingCharacter(null);
+    setEditName("");
   };
 
   return (
@@ -75,50 +106,117 @@ export function CharactersSidebar({
           </Button>
         </div>
 
-        {characters.map((character) => (
-          <div
-            key={character.id}
-            className="flex items-center gap-2 p-2 border rounded-lg mb-2"
-          >
-            {character.image ? (
-              <img
-                src={character.image}
-                alt={character.name}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                <Image className="h-5 w-5 text-gray-400" />
-              </div>
-            )}
-            <span className="flex-1">{character.name}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id={`image-upload-${character.id}`}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleImageUpload(character.id, file);
-                }
-              }}
-            />
-            <label
-              htmlFor={`image-upload-${character.id}`}
-              className="cursor-pointer p-1 hover:bg-gray-100 rounded"
+        <div className="space-y-3">
+          {characters.map((character) => (
+            <div
+              key={character.id}
+              className={`flex items-center gap-2 p-2 border rounded-lg ${
+                editingCharacter?.id === character.id
+                  ? "border-red-200 bg-red-50"
+                  : ""
+              }`}
             >
-              <Image className="h-4 w-4" />
-            </label>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDeleteCharacter(character.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
+              {editingCharacter?.id === character.id ? (
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    {character.image ? (
+                      <img
+                        src={character.image}
+                        alt={character.name}
+                        className="w-14 h-14 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-md bg-gray-200 flex items-center justify-center">
+                        <Image className="h-6 w-6 text-gray-400" />
+                      </div>
+                    )}
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Nome personaggio"
+                      className="flex-1 text-sm"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      onClick={cancelEditing}
+                      variant="ghost"
+                      size="sm"
+                      className="text-slate-600 hover:text-slate-800"
+                    >
+                      Annulla
+                    </Button>
+                    <Button
+                      onClick={saveEditing}
+                      variant="default"
+                      size="sm"
+                      className="bg-red-500 hover:bg-red-600 text-white"
+                    >
+                      Salva
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-start gap-2 w-full">
+                    {character.image ? (
+                      <img
+                        src={character.image}
+                        alt={character.name}
+                        className="w-14 h-14 rounded-md object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0">
+                        <Image className="h-6 w-6 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-sm break-words leading-tight whitespace-normal">
+                        {character.name}
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id={`image-upload-${character.id}`}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(character.id, file);
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={`image-upload-${character.id}`}
+                          className="cursor-pointer p-0.5 hover:bg-gray-100 rounded"
+                        >
+                          <Image className="h-3.5 w-3.5" />
+                        </label>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => startEditing(character)}
+                          className="h-6 w-6"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteCharacter(character.id)}
+                          className="h-6 w-6"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
