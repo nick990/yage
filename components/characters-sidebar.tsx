@@ -12,6 +12,7 @@ interface CharactersSidebarProps {
     oldCharacter: Character,
     newCharacter: Character
   ) => void;
+  onCharacterDelete?: (deletedCharacter: Character) => void;
 }
 
 export function CharactersSidebar({
@@ -19,6 +20,7 @@ export function CharactersSidebar({
   onCharactersChange,
   onClose,
   onCharacterUpdate,
+  onCharacterDelete,
 }: CharactersSidebarProps) {
   const [newCharacterName, setNewCharacterName] = useState("");
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
@@ -46,6 +48,9 @@ export function CharactersSidebar({
       onCharactersChange(characters.filter((char) => char.id !== id));
       if (editingCharacter?.id === id) {
         setEditingCharacter(null);
+      }
+      if (onCharacterDelete) {
+        onCharacterDelete(character);
       }
     }
   };

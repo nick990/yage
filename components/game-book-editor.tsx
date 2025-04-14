@@ -1004,6 +1004,23 @@ function GameBookEditorContent() {
                 })
               );
             }}
+            onCharacterDelete={(deletedCharacter) => {
+              // Rimuovi il personaggio da tutti i nodi che lo usano
+              setNodes((nds) =>
+                nds.map((node) => {
+                  if (node.data.character?.id === deletedCharacter.id) {
+                    return {
+                      ...node,
+                      data: {
+                        ...node.data,
+                        character: null,
+                      },
+                    };
+                  }
+                  return node;
+                })
+              );
+            }}
           />
         )}
 
