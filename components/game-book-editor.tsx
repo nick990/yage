@@ -19,6 +19,7 @@ import ReactFlow, {
   ReactFlowProvider,
   EdgeLabelRenderer,
   getBezierPath,
+  ControlButton,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { PageNode } from "./page-node";
@@ -750,19 +751,25 @@ function GameBookEditorContent() {
     }
   };
 
+  const navigateToStartPage = () => {
+    if (!startPage) {
+      return;
+    }
+    const { zoom } = reactFlowInstance.getViewport();
+    reactFlowInstance.setCenter(
+      startPage.position.x,
+      startPage.position.y + 200,
+      { duration: 800, zoom }
+    );
+  };
+
   // Inizia il play mode
   const startPlayMode = () => {
     if (startPage) {
       setCurrentPageId(startPage.id);
       setIsPlayMode(true);
 
-      // Centra la vista sulla pagina iniziale
-      const { zoom } = reactFlowInstance.getViewport();
-      reactFlowInstance.setCenter(
-        startPage.position.x,
-        startPage.position.y + 200,
-        { duration: 800, zoom }
-      );
+      navigateToStartPage();
     }
   };
 
@@ -979,7 +986,11 @@ function GameBookEditorContent() {
             minZoom={0.1}
             maxZoom={4}
           >
-            <Controls />
+            <Controls>
+              <ControlButton onClick={navigateToStartPage}>
+                <Flag size={20} />
+              </ControlButton>
+            </Controls>
             <MiniMap />
             <Background />
           </ReactFlow>
