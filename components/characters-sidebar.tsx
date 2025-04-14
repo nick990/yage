@@ -43,7 +43,7 @@ export function CharactersSidebar({
   };
 
   return (
-    <div className="w-64 h-full border-l border-gray-200 p-4 flex flex-col">
+    <div className="w-64 h-full border-l border-gray-200 p-4 flex flex-col flex-shrink-0">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Personaggi</h2>
         <Button
