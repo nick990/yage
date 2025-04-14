@@ -976,7 +976,13 @@ function GameBookEditorContent() {
             edgeTypes={memoizedEdgeTypes}
             deleteKeyCode={["Backspace", "Delete"]}
             edgeUpdaterRadius={10}
-          />
+            minZoom={0.1}
+            maxZoom={4}
+          >
+            <Controls />
+            <MiniMap />
+            <Background />
+          </ReactFlow>
         </div>
 
         {/* Sidebar dei personaggi */}
