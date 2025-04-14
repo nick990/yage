@@ -35,9 +35,18 @@ export function CharactersSidebar({
   };
 
   const handleDeleteCharacter = (id: string) => {
-    onCharactersChange(characters.filter((char) => char.id !== id));
-    if (editingCharacter?.id === id) {
-      setEditingCharacter(null);
+    const character = characters.find((char) => char.id === id);
+    if (!character) return;
+
+    if (
+      window.confirm(
+        `Sei sicuro di voler eliminare il personaggio "${character.name}"?`
+      )
+    ) {
+      onCharactersChange(characters.filter((char) => char.id !== id));
+      if (editingCharacter?.id === id) {
+        setEditingCharacter(null);
+      }
     }
   };
 
