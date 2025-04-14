@@ -987,6 +987,23 @@ function GameBookEditorContent() {
               setCharacters(updatedCharacters);
             }}
             onClose={() => setIsCharactersSidebarVisible(false)}
+            onCharacterUpdate={(oldCharacter, newCharacter) => {
+              // Aggiorna tutti i nodi che usano questo personaggio
+              setNodes((nds) =>
+                nds.map((node) => {
+                  if (node.data.character?.id === oldCharacter.id) {
+                    return {
+                      ...node,
+                      data: {
+                        ...node.data,
+                        character: newCharacter,
+                      },
+                    };
+                  }
+                  return node;
+                })
+              );
+            }}
           />
         )}
 
