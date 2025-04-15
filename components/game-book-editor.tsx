@@ -1226,65 +1226,83 @@ function GameBookEditorContent() {
             <div className="flex-1 overflow-auto p-4">
               {currentPageId && (
                 <div className="space-y-4">
-                  <h4 className="text-xl font-semibold">
-                    {
-                      nodes.find((node) => node.id === currentPageId)?.data
-                        .title
-                    }
-                  </h4>
-                  {nodes.find((node) => node.id === currentPageId)?.data
-                    .image && (
-                    <div className="w-full overflow-hidden rounded-md">
-                      <img
-                        src={
-                          nodes.find((node) => node.id === currentPageId)?.data
-                            .image
-                        }
-                        alt="Page illustration"
-                        className="w-full h-auto object-contain"
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-4">
-                    <div
-                      className="prose max-w-none"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          nodes.find((node) => node.id === currentPageId)?.data
-                            .content || "",
-                      }}
-                    />
-
-                    <div className="space-y-2">
-                      {getAvailableChoices().map((choice) => {
-                        if (!choice) return null;
-                        const destinationPage = getDestinationPage(choice.id);
-                        return (
-                          <Button
-                            key={choice.id}
-                            onClick={() =>
-                              navigateToPage(destinationPage?.id || "")
-                            }
-                            className="w-full justify-start text-left bg-blue-200 hover:bg-blue-300 border border-slate-200 p-6"
-                          >
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="font-semibold text-slate-800">
-                                {choice.data.title}
-                              </span>
-                              {choice.data.content && (
-                                <span
-                                  className="text-xs text-slate-600"
-                                  dangerouslySetInnerHTML={{
-                                    __html: choice.data.content,
-                                  }}
-                                />
-                              )}
+                  {/* Store current node in a variable */}
+                  {(() => {
+                    const currentNode = nodes.find(
+                      (node) => node.id === currentPageId
+                    );
+                    return (
+                      <>
+                        <h4 className="text-xl font-semibold">
+                          {currentNode?.data.title}
+                        </h4>
+                        {/* Character display */}
+                        {currentNode?.data.character && (
+                          <div className="flex flex-col items-center justify-center mb-4">
+                            <div className="w-32 h-32 bg-white shadow-sm overflow-hidden">
+                              <img
+                                src={currentNode.data.character.image}
+                                alt="Character"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                            <span className="mt-2 text-sm font-medium text-slate-700 bg-white px-2 py-1 rounded-md shadow-sm">
+                              {currentNode.data.character.name}
+                            </span>
+                          </div>
+                        )}
+                        {currentNode?.data.image && (
+                          <div className="w-full overflow-hidden rounded-md">
+                            <img
+                              src={currentNode.data.image}
+                              alt="Page illustration"
+                              className="w-full h-auto object-contain"
+                            />
+                          </div>
+                        )}
+                        <div className="space-y-4">
+                          <div
+                            className="prose max-w-none"
+                            dangerouslySetInnerHTML={{
+                              __html: currentNode?.data.content || "",
+                            }}
+                          />
+
+                          <div className="space-y-2">
+                            {getAvailableChoices().map((choice) => {
+                              if (!choice) return null;
+                              const destinationPage = getDestinationPage(
+                                choice.id
+                              );
+                              return (
+                                <Button
+                                  key={choice.id}
+                                  onClick={() =>
+                                    navigateToPage(destinationPage?.id || "")
+                                  }
+                                  className="w-full justify-start text-left bg-blue-200 hover:bg-blue-300 border border-slate-200 p-6"
+                                >
+                                  <div className="flex flex-col items-start gap-1">
+                                    <span className="font-semibold text-slate-800">
+                                      {choice.data.title}
+                                    </span>
+                                    {choice.data.content && (
+                                      <span
+                                        className="text-xs text-slate-600"
+                                        dangerouslySetInnerHTML={{
+                                          __html: choice.data.content,
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>
