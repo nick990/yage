@@ -778,26 +778,18 @@ function GameBookEditorContent() {
     }
   };
 
-  const navigateToStartPage = () => {
-    if (!startPage) {
-      return;
+  // Inizia il play mode
+  const startPlayMode = (fromStart: boolean = true) => {
+    const startingPage = fromStart ? startPage : selectedNode;
+    if (startingPage) {
+      setCurrentPageId(startingPage.id);
+      setIsPlayMode(true);
+      navigateToPage(startingPage.id);
     }
-    const { zoom } = reactFlowInstance.getViewport();
-    reactFlowInstance.setCenter(
-      startPage.position.x,
-      startPage.position.y + 200,
-      { duration: 800, zoom }
-    );
   };
 
-  // Inizia il play mode
-  const startPlayMode = () => {
-    if (startPage) {
-      setCurrentPageId(startPage.id);
-      setIsPlayMode(true);
-
-      navigateToStartPage();
-    }
+  const navigateToStartPage = () => {
+    navigateToPage(startPage!.id);
   };
 
   // Gestisce la navigazione tra le pagine
@@ -909,19 +901,43 @@ function GameBookEditorContent() {
           <ArrowRightFromLine className="h-4 w-4" />
           Add Choice
         </Button>
-        <Button
-          onClick={isPlayMode ? () => setIsPlayMode(false) : startPlayMode}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
-        >
-          {isPlayMode ? (
-            <Square className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-          {isPlayMode ? "Stop" : "Play"}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+            >
+              <Play className="h-4 w-4" />
+              Play
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={() => startPlayMode()}
+              className="flex items-center gap-2"
+            >
+              <Flag className="h-4 w-4" />
+              from Start
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                startPlayMode(false);
+              }}
+              disabled={!selectedNode || selectedNode.type !== "page"}
+              className="flex items-center gap-2"
+            >
+              <ArrowRightFromLine className="h-4 w-4" />
+              from Selected
+              {(!selectedNode || selectedNode.type !== "page") && (
+                <span className="text-xs text-slate-400 ml-1">
+                  (select a page first)
+                </span>
+              )}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           onClick={handleCharactersClick}
           variant="outline"
