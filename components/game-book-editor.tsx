@@ -94,6 +94,32 @@ function CustomEdge({
 
   return (
     <>
+      <defs>
+        <marker
+          id="arrow"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1" />
+        </marker>
+      </defs>
+      {/* Invisible wider path for easier selection */}
+      <path
+        id={`${id}-selection`}
+        className="react-flow__edge-path"
+        d={edgePath}
+        style={{
+          ...style,
+          stroke: "transparent",
+          strokeWidth: 20,
+          cursor: "pointer",
+        }}
+      />
+      {/* Visible edge path */}
       <path
         id={id}
         className="react-flow__edge-path"
@@ -101,8 +127,9 @@ function CustomEdge({
         markerEnd="url(#arrow)"
         style={{
           ...style,
-          stroke: "#6366f1",
-          strokeWidth: 2.5,
+          stroke: selected ? "#4f46e5" : "#6366f1",
+          strokeWidth: selected ? 3.5 : 2.5,
+          cursor: "pointer",
         }}
       />
       {selected && (
