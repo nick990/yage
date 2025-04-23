@@ -144,10 +144,10 @@ function CustomEdge({
             className="nodrag nopan"
           >
             <button
-              className="flex items-center justify-center w-5 h-5 rounded-full bg-white/100 border border-slate-200 shadow-md hover:bg-rose-50 hover:text-rose-500 transition-colors z-[10000] relative"
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white/100 border border-slate-200 shadow-md hover:bg-rose-50 hover:text-rose-500 transition-colors z-[10000] relative"
               onClick={(event) => onEdgeDeleteClick(event, id)}
             >
-              <Trash className="w-3 h-3" />
+              <Trash className="w-8 h-8" />
             </button>
           </div>
         </EdgeLabelRenderer>
@@ -1245,27 +1245,6 @@ function GameBookEditorContent() {
                     </p>
                   )}
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedEdge && !selectedNode && (
-          <div className="w-full md:w-1/3 p-4 border-l border-slate-200 bg-white">
-            <h3 className="text-lg font-medium mb-4 text-slate-800">
-              Edit Connection
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-slate-500">
-                  Connection ID: {selectedEdge.id}
-                </p>
-                <p className="text-sm text-slate-500">
-                  From: {selectedEdge.source}
-                </p>
-                <p className="text-sm text-slate-500">
-                  To: {selectedEdge.target}
-                </p>
               </div>
             </div>
           </div>
