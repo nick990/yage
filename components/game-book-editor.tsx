@@ -916,16 +916,24 @@ function GameBookEditorContent() {
           <DropdownMenuContent>
             <DropdownMenuItem
               onClick={() => startPlayMode()}
+              disabled={isPlayMode}
               className="flex items-center gap-2"
             >
               <Flag className="h-4 w-4" />
               from Start
+              {isPlayMode && (
+                <span className="text-xs text-slate-400 ml-1">
+                  (stop current play first)
+                </span>
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
                 startPlayMode(false);
               }}
-              disabled={!selectedNode || selectedNode.type !== "page"}
+              disabled={
+                isPlayMode || !selectedNode || selectedNode.type !== "page"
+              }
               className="flex items-center gap-2"
             >
               <ArrowRightFromLine className="h-4 w-4" />
@@ -935,6 +943,21 @@ function GameBookEditorContent() {
                   (select a page first)
                 </span>
               )}
+              {isPlayMode && (
+                <span className="text-xs text-slate-400 ml-1">
+                  (stop current play first)
+                </span>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setIsPlayMode(false);
+              }}
+              disabled={!isPlayMode}
+              className="flex items-center gap-2"
+            >
+              <Square className="h-4 w-4" />
+              Stop
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
