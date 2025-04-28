@@ -32,7 +32,6 @@ import {
   Download,
   Upload,
   RefreshCw,
-  ZoomIn,
   Flag,
   X,
   Image,
@@ -44,6 +43,7 @@ import {
   Square,
   Users,
   ArrowLeft,
+  Target,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -790,6 +790,10 @@ function GameBookEditorContent() {
     }
   };
 
+  const navigateToCurrentPage = () => {
+    navigateToPage(selectedNode!.id);
+  };
+
   const navigateToStartPage = () => {
     navigateToPage(startPage!.id);
   };
@@ -1080,6 +1084,12 @@ function GameBookEditorContent() {
               <ControlButton onClick={navigateToStartPage}>
                 <Flag size={20} />
               </ControlButton>
+              <ControlButton
+                onClick={navigateToCurrentPage}
+                disabled={selectedNode == null}
+              >
+                <Target size={20} />
+              </ControlButton>
             </Controls>
             <MiniMap />
             <Background />
@@ -1135,9 +1145,19 @@ function GameBookEditorContent() {
           <div className="w-full md:w-1/3 flex flex-col border-l border-slate-200 bg-white">
             <div className="flex-none p-4 border-b border-slate-200 bg-slate-50">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-slate-800">
-                  Edit {selectedNode.type === "page" ? "Page" : "Choice"}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-medium text-slate-800">
+                    Edit {selectedNode.type === "page" ? "Page" : "Choice"}
+                  </h3>
+                  <Button
+                    onClick={navigateToCurrentPage}
+                    variant="outline"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                  >
+                    <Target className="h-4 w-4" />
+                  </Button>
+                </div>
                 <Button
                   onClick={() => {
                     // Deseleziona il nodo cliccando sul pannello
