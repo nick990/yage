@@ -43,6 +43,7 @@ import {
   Play,
   Square,
   Users,
+  ArrowLeft,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -202,8 +203,9 @@ function GameBookEditorContent() {
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [isPlayMode, setIsPlayMode] = useState(false);
   const [currentPageId, setCurrentPageId] = useState<string | null>(null);
+  const [pageHistory, setPageHistory] = useState<string[]>([]);
+  const [isPlayMode, setIsPlayMode] = useState(false);
   const [isCharactersSidebarVisible, setIsCharactersSidebarVisible] =
     useState(false);
 
@@ -795,6 +797,8 @@ function GameBookEditorContent() {
   // Gestisce la navigazione tra le pagine
   const navigateToPage = (targetNodeId: string) => {
     setCurrentPageId(targetNodeId);
+    // Aggiungi la pagina alla cronologia
+    setPageHistory((prev) => [...prev, targetNodeId]);
     // Scroll to top
     const sidebar = document.querySelector(".overflow-auto");
     if (sidebar) {
@@ -810,6 +814,26 @@ function GameBookEditorContent() {
         targetNode.position.y + 200,
         { duration: 800, zoom }
       );
+    }
+  };
+
+  // Torna alla pagina precedente
+  const goBack = () => {
+    if (pageHistory.length > 1) {
+      const previousPage = pageHistory[pageHistory.length - 2];
+      setPageHistory((prev) => prev.slice(0, -1));
+      setCurrentPageId(previousPage);
+
+      // Centra la vista sulla pagina precedente
+      const targetNode = nodes.find((node) => node.id === previousPage);
+      if (targetNode) {
+        const { zoom } = reactFlowInstance.getViewport();
+        reactFlowInstance.setCenter(
+          targetNode.position.x,
+          targetNode.position.y + 200,
+          { duration: 800, zoom }
+        );
+      }
     }
   };
 
@@ -1257,14 +1281,26 @@ function GameBookEditorContent() {
                 <h3 className="text-lg font-medium text-slate-800">
                   Play Mode
                 </h3>
-                <Button
-                  onClick={() => setIsPlayMode(false)}
-                  variant="outline"
-                  size="sm"
-                  className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
-                >
-                  <Square className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-2">
+                  {pageHistory.length > 1 && (
+                    <Button
+                      onClick={goBack}
+                      variant="outline"
+                      size="sm"
+                      className="bg-white hover:bg-slate-50 border-slate-200"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => setIsPlayMode(false)}
+                    variant="outline"
+                    size="sm"
+                    className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+                  >
+                    <Square className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
 
