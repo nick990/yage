@@ -44,6 +44,7 @@ import {
   Users,
   ArrowLeft,
   Target,
+  Milestone,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -54,6 +55,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CharactersSidebar } from "./characters-sidebar";
 import { Character } from "@/models/character";
+import { MilestonesSidebar } from "./milestones-sidebar";
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -207,6 +209,8 @@ function GameBookEditorContent() {
   const [pageHistory, setPageHistory] = useState<string[]>([]);
   const [isPlayMode, setIsPlayMode] = useState(false);
   const [isCharactersSidebarVisible, setIsCharactersSidebarVisible] =
+    useState(false);
+  const [isMilestonesSidebarVisible, setIsMilestonesSidebarVisible] =
     useState(false);
 
   // Trova il nodo selezionato
@@ -866,17 +870,18 @@ function GameBookEditorContent() {
     return nodes.find((node) => node.id === choiceEdge.target);
   };
 
+  function handleMilestonesClick() {
+    setIsMilestonesSidebarVisible((prev) => !prev); // Toggle visibility
+  }
+
   function handleCharactersClick() {
     setIsCharactersSidebarVisible((prev) => !prev); // Toggle visibility
   }
 
   const handleCharacterChange = (characterId: string) => {
-    console.log("Selected character ID:", characterId);
-
     const selectedCharacter = characters.find(
       (char) => char.id === characterId
     );
-    console.log("Selected character:", selectedCharacter);
     setNodeCharacter(selectedCharacter!);
 
     if (selectedNode) {
@@ -989,6 +994,7 @@ function GameBookEditorContent() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
         <Button
           onClick={handleCharactersClick}
           variant="outline"
@@ -997,6 +1003,15 @@ function GameBookEditorContent() {
         >
           <Users className="h-4 w-4" />
           Characters
+        </Button>
+        <Button
+          onClick={handleMilestonesClick}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+        >
+          <Milestone className="h-4 w-4" />
+          Milestones
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1095,7 +1110,13 @@ function GameBookEditorContent() {
             <Background />
           </ReactFlow>
         </div>
-
+        {/* Sidebar delle milestone */}
+        {isMilestonesSidebarVisible && (
+          <MilestonesSidebar
+            milestones={[]}
+            onClose={() => setIsMilestonesSidebarVisible(false)}
+          />
+        )}
         {/* Sidebar dei personaggi */}
         {isCharactersSidebarVisible && (
           <CharactersSidebar
