@@ -44,7 +44,7 @@ import {
   Users,
   ArrowLeft,
   Target,
-  Milestone,
+  Milestone as MilestoneIcon,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CharactersSidebar } from "./characters-sidebar";
 import { Character } from "@/models/character";
+import { Milestone } from "@/models/milestone";
 import { MilestonesSidebar } from "./milestones-sidebar";
 
 // Define custom node types
@@ -200,6 +201,7 @@ function GameBookEditorContent() {
   const [nodeContent, setNodeContent] = useState("");
   const [nodeImage, setNodeImage] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [nodeCharacter, setNodeCharacter] = useState<Character | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
@@ -235,7 +237,7 @@ function GameBookEditorContent() {
       setNodeImage(selectedNode.data.image || null);
       setNodeCharacter(selectedNode.data.character || null);
     }
-  }, [selectedNode, characters]);
+  }, [selectedNode, characters, milestones]);
 
   // Handle connections between nodes
   const onConnect = useCallback(
@@ -595,6 +597,7 @@ function GameBookEditorContent() {
       nodes: processedNodes,
       edges: edges,
       characters: characters,
+      milestones: milestones,
     };
 
     const jsonString = JSON.stringify(gameBookData, null, 2);
@@ -711,9 +714,15 @@ function GameBookEditorContent() {
         if (!jsonData.characters || !Array.isArray(jsonData.characters)) {
           throw new Error("Invalid JSON format: missing characters array");
         }
+        if (!jsonData.milestones || !Array.isArray(jsonData.milestones)) {
+          throw new Error("Invalid JSON format: missing milestones array");
+        }
 
         // Set characters
         setCharacters(jsonData.characters);
+
+        // Set milestones
+        setMilestones(jsonData.milestones);
 
         // Create a map of characters by ID for quick lookup
         const charactersMap = new Map(
@@ -1010,7 +1019,7 @@ function GameBookEditorContent() {
           size="sm"
           className="flex items-center gap-2 bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
         >
-          <Milestone className="h-4 w-4" />
+          <MilestoneIcon className="h-4 w-4" />
           Milestones
         </Button>
         <DropdownMenu>
@@ -1113,8 +1122,11 @@ function GameBookEditorContent() {
         {/* Sidebar delle milestone */}
         {isMilestonesSidebarVisible && (
           <MilestonesSidebar
-            milestones={[]}
+            milestones={milestones}
             onClose={() => setIsMilestonesSidebarVisible(false)}
+            onMilestonesChange={(updatedMilestones) => {
+              setMilestones(updatedMilestones);
+            }}
           />
         )}
         {/* Sidebar dei personaggi */}
