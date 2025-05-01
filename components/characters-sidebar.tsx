@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Character, createCharacter } from "@/models/character";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,19 +8,12 @@ interface CharactersSidebarProps {
   characters: Character[];
   onCharactersChange: (characters: Character[]) => void;
   onClose: () => void;
-  onCharacterUpdate?: (
-    oldCharacter: Character,
-    newCharacter: Character
-  ) => void;
-  onCharacterDelete?: (deletedCharacter: Character) => void;
 }
 
 export function CharactersSidebar({
   characters,
   onCharactersChange,
   onClose,
-  onCharacterUpdate,
-  onCharacterDelete,
 }: CharactersSidebarProps) {
   const [newCharacterName, setNewCharacterName] = useState("");
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
@@ -45,13 +38,10 @@ export function CharactersSidebar({
         `Are you sure you want to delete the character "${character.name}"?`
       )
     ) {
-      onCharactersChange(characters.filter((char) => char.id !== id));
       if (editingCharacter?.id === id) {
         setEditingCharacter(null);
       }
-      if (onCharacterDelete) {
-        onCharacterDelete(character);
-      }
+      onCharactersChange(characters.filter((char) => char.id !== id));
     }
   };
 
@@ -65,10 +55,6 @@ export function CharactersSidebar({
       onCharactersChange(
         characters.map((char) => (char.id === id ? newCharacter : char))
       );
-
-      if (onCharacterUpdate && oldCharacter) {
-        onCharacterUpdate(oldCharacter, newCharacter);
-      }
     };
     reader.readAsDataURL(file);
   };
@@ -79,22 +65,14 @@ export function CharactersSidebar({
   };
 
   const saveEditing = () => {
-    if (editingCharacter && editName.trim()) {
-      const newCharacter = { ...editingCharacter, name: editName.trim() };
-
-      onCharactersChange(
-        characters.map((char) =>
-          char.id === editingCharacter.id ? newCharacter : char
-        )
-      );
-
-      if (onCharacterUpdate) {
-        onCharacterUpdate(editingCharacter, newCharacter);
-      }
-
-      setEditingCharacter(null);
-      setEditName("");
-    }
+    if (!editingCharacter) return;
+    const newCharacter = { ...editingCharacter, name: editName.trim() };
+    onCharactersChange(
+      characters.map((char) =>
+        char.id === editingCharacter.id ? newCharacter : char
+      )
+    );
+    cancelEditing();
   };
 
   const cancelEditing = () => {

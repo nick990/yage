@@ -14,7 +14,6 @@ import ReactFlow, {
   type Edge,
   type Node,
   type NodeTypes,
-  Panel,
   useReactFlow,
   ReactFlowProvider,
   EdgeLabelRenderer,
@@ -274,6 +273,10 @@ function GameBookEditorContent() {
     );
   }, []);
 
+  useEffect(() => {
+    updateNodeCharacters();
+  }, [characters]);
+
   // Handle node selection
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedEdge(null);
@@ -353,7 +356,39 @@ function GameBookEditorContent() {
     };
     setNodes((nds) => nds.concat(newNode));
   };
-
+  const updateNodeCharacters = () => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        // Se il nodo ha un personaggio associato
+        if (node.data.character) {
+          const nodeCharacterId = node.data.character.id;
+          // Cerca se il personaggio esiste ancora nella lista dei personaggi
+          const character = characters.find((c) => c.id === nodeCharacterId);
+          // Se il personaggio non esiste più
+          if (!character) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                character: null, // Rimuovi il riferimento al personaggio
+              },
+            };
+          } else {
+            // Se il nodo non ha un personaggio associato, cerca il personaggio nella lista dei personaggi
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                character: character,
+              },
+            };
+          }
+        } else {
+          return node;
+        }
+      })
+    );
+  };
   // Update node data
   const updateNodeData = () => {
     if (!selectedNode) return;
@@ -1137,40 +1172,6 @@ function GameBookEditorContent() {
               setCharacters(updatedCharacters);
             }}
             onClose={() => setIsCharactersSidebarVisible(false)}
-            onCharacterUpdate={(oldCharacter, newCharacter) => {
-              // Aggiorna tutti i nodi che usano questo personaggio
-              setNodes((nds) =>
-                nds.map((node) => {
-                  if (node.data.character?.id === oldCharacter.id) {
-                    return {
-                      ...node,
-                      data: {
-                        ...node.data,
-                        character: newCharacter,
-                      },
-                    };
-                  }
-                  return node;
-                })
-              );
-            }}
-            onCharacterDelete={(deletedCharacter) => {
-              // Rimuovi il personaggio da tutti i nodi che lo usano
-              setNodes((nds) =>
-                nds.map((node) => {
-                  if (node.data.character?.id === deletedCharacter.id) {
-                    return {
-                      ...node,
-                      data: {
-                        ...node.data,
-                        character: null,
-                      },
-                    };
-                  }
-                  return node;
-                })
-              );
-            }}
           />
         )}
 

@@ -62,8 +62,7 @@ export function MilestonesSidebar({
         milestone.id === editingMilestone.id ? updatedMilestone : milestone
       )
     );
-
-    setEditingMilestone(null);
+    cancelEditing();
   };
 
   return (
