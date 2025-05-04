@@ -52,10 +52,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CharactersSidebar } from "./characters-sidebar";
+import { CharactersSidebar } from "./sidebars/characters-sidebar";
 import { Character } from "@/models/character";
 import { Milestone } from "@/models/milestone";
-import { MilestonesSidebar } from "./milestones-sidebar";
+import { MilestonesSidebar } from "./sidebars/milestones-sidebar";
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
