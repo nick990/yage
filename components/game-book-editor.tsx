@@ -707,6 +707,7 @@ function GameBookEditorContent() {
         content: node.data.content,
         image: node.data.image,
         characterId: node.data.character?.id,
+        triggerMilestoneId: node.data.triggerMilestone?.id,
         incomingPages:
           incomingEdgesMap
             .get(node.id)
@@ -721,6 +722,7 @@ function GameBookEditorContent() {
       pages,
       choices,
       characters,
+      milestones,
     };
 
     const jsonString = JSON.stringify(gameBookData, null, 2);
