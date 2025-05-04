@@ -590,6 +590,11 @@ function GameBookEditorContent() {
         nodeData.characterId = node.data.character.id;
       }
 
+      // Add trigger milestone ID if present
+      if (node.data.triggerMilestone) {
+        nodeData.triggerMilestoneId = node.data.triggerMilestone.id;
+      }
+
       // Add special node flags if present
       if (node.data.isStartNode) {
         nodeData.isStartNode = true;
@@ -765,7 +770,13 @@ function GameBookEditorContent() {
         const charactersMap = new Map(
           jsonData.characters.map((char: Character) => [char.id, char])
         );
-
+        // Create a map of milestones by ID for quick lookup
+        const milestonesMap = new Map(
+          jsonData.milestones.map((milestone: Milestone) => [
+            milestone.id,
+            milestone,
+          ])
+        );
         // Process imported nodes
         const importedNodes = jsonData.nodes.map((node: any) => {
           const nodeData: any = {
@@ -791,6 +802,13 @@ function GameBookEditorContent() {
             }
           }
 
+          // If the node has a triggerMilestoneId, find and assign the corresponding milestone object
+          if (node.triggerMilestoneId) {
+            const milestone = milestonesMap.get(node.triggerMilestoneId);
+            if (milestone) {
+              nodeData.data.triggerMilestone = milestone;
+            }
+          }
           return nodeData;
         });
 
@@ -928,6 +946,8 @@ function GameBookEditorContent() {
     const selectedCharacter = characters.find(
       (char) => char.id === characterId
     );
+
+    //TODO: controllare se funziona la rimozione del character da una page
     setNodeCharacter(selectedCharacter!);
 
     if (selectedNode) {
@@ -940,6 +960,29 @@ function GameBookEditorContent() {
                 ...node.data,
                 character: selectedCharacter,
                 image: selectedCharacter ? null : node.data.image, // Rimuovi l'immagine se c'è un character
+              },
+            };
+          }
+          return node;
+        })
+      );
+    }
+  };
+
+  const handleTriggerMilestoneChange = (milestoneId: string) => {
+    const selectedMilestone = milestones.find(
+      (milestone) => milestone.id === milestoneId
+    );
+
+    if (selectedNode) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                triggerMilestone: selectedMilestone,
               },
             };
           }
@@ -1208,6 +1251,8 @@ function GameBookEditorContent() {
               selectedNode={selectedNode}
               nodeTitle={nodeTitle}
               nodeContent={nodeContent}
+              milestones={milestones}
+              onTriggerMilestoneChange={handleTriggerMilestoneChange}
               onTitleChange={handleTitleChange}
               onContentChange={handleContentChange}
               onNavigateToCurrentPage={navigateToCurrentPage}

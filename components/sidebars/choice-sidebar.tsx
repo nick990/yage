@@ -2,11 +2,14 @@ import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { Target, X } from "lucide-react";
 import { Node } from "reactflow";
+import { Milestone } from "@/models/milestone";
 
 interface ChoiceSidebarProps {
   selectedNode: Node;
   nodeTitle: string;
   nodeContent: string;
+  milestones: Milestone[];
+  onTriggerMilestoneChange: (milestoneId: string) => void;
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onContentChange: (content: string) => void;
   onNavigateToCurrentPage: () => void;
@@ -17,6 +20,8 @@ export function ChoiceSidebar({
   selectedNode,
   nodeTitle,
   nodeContent,
+  milestones,
+  onTriggerMilestoneChange,
   onTitleChange,
   onContentChange,
   onNavigateToCurrentPage,
@@ -67,7 +72,24 @@ export function ChoiceSidebar({
             </label>
             <RichTextEditor content={nodeContent} onChange={onContentChange} />
           </div>
-
+          {/* Milestone section */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-slate-700">
+              Milestone
+            </label>
+            <select
+              value={selectedNode.data.triggerMilestone?.id || ""}
+              onChange={(e) => onTriggerMilestoneChange(e.target.value)}
+              className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
+            >
+              <option value="">No Milestone</option>
+              {milestones.map((milestone) => (
+                <option key={milestone.id} value={milestone.id}>
+                  {milestone.text}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <p className="text-sm text-slate-500">Node ID: {selectedNode.id}</p>
             <p className="text-sm text-slate-500">Type: Choice</p>
