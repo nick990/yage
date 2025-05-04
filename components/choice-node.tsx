@@ -78,18 +78,6 @@ export const ChoiceNode = memo(
             }}
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
-
-          {/* Display image if available */}
-          {data.image && (
-            <div className="mt-2">
-              <img
-                src={data.image || "/placeholder.svg"}
-                alt={`Image for ${data.title}`}
-                className="w-full h-auto object-contain rounded border border-slate-200"
-                style={{ maxHeight: "50px" }}
-              />
-            </div>
-          )}
         </div>
 
         {/* Input handle */}

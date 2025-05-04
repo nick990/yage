@@ -1235,71 +1235,75 @@ function GameBookEditorContent() {
                 </div>
 
                 {/* Image section */}
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">
-                    Image
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    {nodeImage ? (
-                      <div className="relative border border-slate-200 rounded-md p-2">
-                        <img
-                          src={nodeImage || "/placeholder.svg"}
-                          alt="Node image"
-                          className="max-w-full max-h-[150px] object-contain mx-auto"
-                        />
-                        <Button
-                          onClick={handleImageDelete}
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
-                        <Image className="h-8 w-8 text-slate-400 mb-2" />
-                        <p className="text-sm text-slate-500 mb-2">
-                          No image uploaded
-                        </p>
-                        <Button
-                          onClick={triggerImageUpload}
-                          variant="outline"
-                          size="sm"
-                          className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
-                        >
-                          Upload Image
-                        </Button>
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      ref={imageInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                      className="hidden"
-                    />
+                {selectedNode.type === "page" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-slate-700">
+                      Image
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      {nodeImage ? (
+                        <div className="relative border border-slate-200 rounded-md p-2">
+                          <img
+                            src={nodeImage || "/placeholder.svg"}
+                            alt="Node image"
+                            className="max-w-full max-h-[150px] object-contain mx-auto"
+                          />
+                          <Button
+                            onClick={handleImageDelete}
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 h-7 w-7 p-0"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center border border-dashed border-slate-300 rounded-md p-6 bg-slate-50">
+                          <Image className="h-8 w-8 text-slate-400 mb-2" />
+                          <p className="text-sm text-slate-500 mb-2">
+                            No image uploaded
+                          </p>
+                          <Button
+                            onClick={triggerImageUpload}
+                            variant="outline"
+                            size="sm"
+                            className="bg-white hover:bg-red-50 hover:text-red-600 border-slate-200"
+                          >
+                            Upload Image
+                          </Button>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        ref={imageInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Character selection */}
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">
-                    Character
-                  </label>
-                  <select
-                    value={nodeCharacter?.id || ""}
-                    onChange={(e) => handleCharacterChange(e.target.value)}
-                    className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
-                  >
-                    <option value="">No Character</option>
-                    {characters.map((character) => (
-                      <option key={character.id} value={character.id}>
-                        {character.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {selectedNode.type === "page" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-slate-700">
+                      Character
+                    </label>
+                    <select
+                      value={nodeCharacter?.id || ""}
+                      onChange={(e) => handleCharacterChange(e.target.value)}
+                      className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
+                    >
+                      <option value="">No Character</option>
+                      {characters.map((character) => (
+                        <option key={character.id} value={character.id}>
+                          {character.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <p className="text-sm text-slate-500">
