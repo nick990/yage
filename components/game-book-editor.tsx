@@ -203,7 +203,6 @@ function GameBookEditorContent() {
   const [nodeImage, setNodeImage] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [nodeCharacter, setNodeCharacter] = useState<Character | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -236,7 +235,6 @@ function GameBookEditorContent() {
       setNodeTitle(selectedNode.data.title || "");
       setNodeContent(selectedNode.data.content || "");
       setNodeImage(selectedNode.data.image || null);
-      setNodeCharacter(selectedNode.data.character || null);
     }
   }, [selectedNode, characters, milestones]);
 
@@ -391,29 +389,6 @@ function GameBookEditorContent() {
       })
     );
   };
-  // Update node data
-  const updateNodeData = () => {
-    if (!selectedNode) return;
-
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === selectedNode.id) {
-          const updatedNode = {
-            ...node,
-            data: {
-              ...node.data,
-              title: nodeTitle,
-              content: nodeContent,
-              image: nodeImage,
-              character: nodeCharacter,
-            },
-          };
-          return updatedNode;
-        }
-        return node;
-      })
-    );
-  };
 
   // Handle title change
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -524,24 +499,6 @@ function GameBookEditorContent() {
           return node;
         })
       );
-    }
-  };
-
-  // Trigger image upload
-  const triggerImageUpload = () => {
-    if (imageInputRef.current) {
-      imageInputRef.current.click();
-    }
-  };
-
-  // Apply changes when input/textarea loses focus or on Enter key
-  const handleBlur = () => {
-    updateNodeData();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      updateNodeData();
     }
   };
 
@@ -948,10 +905,6 @@ function GameBookEditorContent() {
     const selectedCharacter = characters.find(
       (char) => char.id === characterId
     );
-
-    //TODO: controllare se funziona la rimozione del character da una page
-    setNodeCharacter(selectedCharacter!);
-
     if (selectedNode) {
       setNodes((nds) =>
         nds.map((node) => {
@@ -1237,7 +1190,6 @@ function GameBookEditorContent() {
               nodeTitle={nodeTitle}
               nodeContent={nodeContent}
               nodeImage={nodeImage}
-              nodeCharacter={nodeCharacter}
               characters={characters}
               onTitleChange={handleTitleChange}
               onContentChange={handleContentChange}

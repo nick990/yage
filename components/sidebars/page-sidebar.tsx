@@ -9,7 +9,6 @@ interface PageSidebarProps {
   nodeTitle: string;
   nodeContent: string;
   nodeImage: string | null;
-  nodeCharacter: Character | null;
   characters: Character[];
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onContentChange: (content: string) => void;
@@ -26,7 +25,6 @@ export function PageSidebar({
   nodeTitle,
   nodeContent,
   nodeImage,
-  nodeCharacter,
   characters,
   onTitleChange,
   onContentChange,
@@ -143,7 +141,7 @@ export function PageSidebar({
               Character
             </label>
             <select
-              value={nodeCharacter?.id || ""}
+              value={selectedNode.data.character?.id || ""}
               onChange={(e) => onCharacterChange(e.target.value)}
               className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
             >
