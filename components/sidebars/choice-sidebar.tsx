@@ -10,6 +10,7 @@ interface ChoiceSidebarProps {
   nodeContent: string;
   milestones: Milestone[];
   onTriggerMilestoneChange: (milestoneId: string) => void;
+  onRequiredMilestoneChange: (milestoneId: string) => void;
   onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onContentChange: (content: string) => void;
   onNavigateToCurrentPage: () => void;
@@ -22,6 +23,7 @@ export function ChoiceSidebar({
   nodeContent,
   milestones,
   onTriggerMilestoneChange,
+  onRequiredMilestoneChange,
   onTitleChange,
   onContentChange,
   onNavigateToCurrentPage,
@@ -72,7 +74,7 @@ export function ChoiceSidebar({
             </label>
             <RichTextEditor content={nodeContent} onChange={onContentChange} />
           </div>
-          {/* Milestone section */}
+          {/* Trigger Milestone section */}
           <div>
             <label className="block text-sm font-medium mb-1 text-slate-700">
               Trigger Milestone
@@ -90,6 +92,26 @@ export function ChoiceSidebar({
               ))}
             </select>
           </div>
+          {/* Required Milestone section */}
+          <div>
+            <label className="block text-sm font-medium mb-1 text-slate-700">
+              Required Milestone
+            </label>
+            <select
+              value={selectedNode.data.requiredMilestone?.id || ""}
+              onChange={(e) => onRequiredMilestoneChange(e.target.value)}
+              className="w-full p-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none"
+            >
+              <option value="">No Milestone</option>
+              {milestones.map((milestone) => (
+                <option key={milestone.id} value={milestone.id}>
+                  {milestone.text}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Debug section */}
           <div>
             <p className="text-sm text-slate-500">Node ID: {selectedNode.id}</p>
             <p className="text-sm text-slate-500">Type: Choice</p>
