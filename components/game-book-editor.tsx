@@ -360,6 +360,7 @@ function GameBookEditorContent() {
   };
 
   const updateNodeMilestones = () => {
+    // Update trigger milestone
     setNodes((nds) =>
       nds.map((node) => {
         // Se il nodo ha una milestone associata
@@ -383,6 +384,38 @@ function GameBookEditorContent() {
               data: {
                 ...node.data,
                 triggerMilestone: milestone,
+              },
+            };
+          }
+        } else {
+          return node;
+        }
+      })
+    );
+    // Update required milestone
+    setNodes((nds) =>
+      nds.map((node) => {
+        // Se il nodo ha una milestone associata
+        if (node.data.requiredMilestone) {
+          const nodeMilestoneId = node.data.requiredMilestone.id;
+          // Cerca se la milestone esiste ancora nella lista delle milestones
+          const milestone = milestones.find((m) => m.id === nodeMilestoneId);
+          // Se la milestone non esiste più
+          if (!milestone) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                requiredMilestone: null,
+              },
+            };
+          } else {
+            // Se la milestone esiste ancora, aggiorna il nodo
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                requiredMilestone: milestone,
               },
             };
           }
@@ -589,6 +622,11 @@ function GameBookEditorContent() {
         nodeData.triggerMilestoneId = node.data.triggerMilestone.id;
       }
 
+      // Add required milestone ID if present
+      if (node.data.requiredMilestone) {
+        nodeData.requiredMilestoneId = node.data.requiredMilestone.id;
+      }
+
       // Add special node flags if present
       if (node.data.isStartNode) {
         nodeData.isStartNode = true;
@@ -702,6 +740,7 @@ function GameBookEditorContent() {
         image: node.data.image,
         characterId: node.data.character?.id,
         triggerMilestoneId: node.data.triggerMilestone?.id,
+        requiredMilestoneId: node.data.requiredMilestone?.id,
         incomingPages:
           incomingEdgesMap
             .get(node.id)
@@ -804,6 +843,15 @@ function GameBookEditorContent() {
               nodeData.data.triggerMilestone = milestone;
             }
           }
+
+          // If the node has a requiredMilestoneId, find and assign the corresponding milestone object
+          if (node.requiredMilestoneId) {
+            const milestone = milestonesMap.get(node.requiredMilestoneId);
+            if (milestone) {
+              nodeData.data.requiredMilestone = milestone;
+            }
+          }
+
           return nodeData;
         });
 
@@ -974,6 +1022,29 @@ function GameBookEditorContent() {
               data: {
                 ...node.data,
                 triggerMilestone: selectedMilestone,
+              },
+            };
+          }
+          return node;
+        })
+      );
+    }
+  };
+
+  const handleRequiredMilestoneChange = (milestoneId: string) => {
+    const selectedMilestone = milestones.find(
+      (milestone) => milestone.id === milestoneId
+    );
+
+    if (selectedNode) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === selectedNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                requiredMilestone: selectedMilestone,
               },
             };
           }
@@ -1243,6 +1314,7 @@ function GameBookEditorContent() {
               nodeContent={nodeContent}
               milestones={milestones}
               onTriggerMilestoneChange={handleTriggerMilestoneChange}
+              onRequiredMilestoneChange={handleRequiredMilestoneChange}
               onTitleChange={handleTitleChange}
               onContentChange={handleContentChange}
               onNavigateToCurrentPage={navigateToCurrentPage}
