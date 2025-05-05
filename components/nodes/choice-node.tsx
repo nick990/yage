@@ -11,8 +11,9 @@ export const ChoiceNode = memo(
   ({ data, isConnectable, id, selected }: NodeProps) => {
     const { setNodes, setEdges } = useReactFlow();
     const nodeRef = useRef<HTMLDivElement>(null);
-    const width = data.width || 250;
-    const height = data.height || 150;
+    const WIDTH = 350;
+    const TRIGGER_HEIGHT = 68;
+    const HEIGHT = 160 + (data.triggerMilestone ? TRIGGER_HEIGHT : 0);
 
     // Function to handle node deletion
     const handleDelete = (event: React.MouseEvent) => {
@@ -39,8 +40,8 @@ export const ChoiceNode = memo(
             : "border-slate-200"
         } bg-slate-50`}
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
+          width: `${WIDTH}px`,
+          height: `${HEIGHT}px`,
           position: "relative",
           padding: "12px",
           overflow: "hidden",
@@ -68,7 +69,7 @@ export const ChoiceNode = memo(
           </div>
         </div>
 
-        <div className="flex flex-col h-[calc(100%-40px)] overflow-hidden">
+        <div className="flex flex-col  overflow-hidden">
           {/* Content area with fixed height and scrolling */}
           <div
             className="mt-3 text-xs text-slate-600 overflow-y-auto prose prose-sm max-w-none node-content"
@@ -79,7 +80,21 @@ export const ChoiceNode = memo(
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
         </div>
-
+        {data.triggerMilestone && (
+          <div
+            className="flex flex-col pt-4 pb-4 overflow-hidden"
+            style={{
+              height: `${TRIGGER_HEIGHT}px`,
+            }}
+          >
+            <div className="text-sm font-bold text-slate-800">
+              Trigger Milestone
+            </div>
+            <div className="text-xs text-slate-600">
+              {data.triggerMilestone?.text}
+            </div>
+          </div>
+        )}
         {/* Input handle */}
         <Handle
           type="target"

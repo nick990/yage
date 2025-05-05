@@ -75,7 +75,7 @@ export function ChoiceSidebar({
           {/* Milestone section */}
           <div>
             <label className="block text-sm font-medium mb-1 text-slate-700">
-              Milestone
+              Trigger Milestone
             </label>
             <select
               value={selectedNode.data.triggerMilestone?.id || ""}

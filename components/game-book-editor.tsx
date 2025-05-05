@@ -277,6 +277,10 @@ function GameBookEditorContent() {
     updateNodeCharacters();
   }, [characters]);
 
+  useEffect(() => {
+    updateNodeMilestones();
+  }, [milestones]);
+
   // Handle node selection
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
     setSelectedEdge(null);
@@ -349,13 +353,46 @@ function GameBookEditorContent() {
       data: {
         title: "New Choice",
         content: "<p>Describe the choice here...</p>",
-        width: 250,
-        height: 150,
         image: null,
       },
     };
     setNodes((nds) => nds.concat(newNode));
   };
+
+  const updateNodeMilestones = () => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        // Se il nodo ha una milestone associata
+        if (node.data.triggerMilestone) {
+          const nodeMilestoneId = node.data.triggerMilestone.id;
+          // Cerca se la milestone esiste ancora nella lista delle milestones
+          const milestone = milestones.find((m) => m.id === nodeMilestoneId);
+          // Se la milestone non esiste più
+          if (!milestone) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                triggerMilestone: null,
+              },
+            };
+          } else {
+            // Se la milestone esiste ancora, aggiorna il nodo
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                triggerMilestone: milestone,
+              },
+            };
+          }
+        } else {
+          return node;
+        }
+      })
+    );
+  };
+
   const updateNodeCharacters = () => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -374,7 +411,7 @@ function GameBookEditorContent() {
               },
             };
           } else {
-            // Se il nodo non ha un personaggio associato, cerca il personaggio nella lista dei personaggi
+            // Se il personaggio esiste ancora, aggiorna il nodo
             return {
               ...node,
               data: {
@@ -745,8 +782,7 @@ function GameBookEditorContent() {
             data: {
               title: node.title,
               content: node.content || "<p>No content</p>",
-              width: node.width || (node.type === "page" ? 360 : 250),
-              height: node.height || (node.type === "page" ? 200 : 150),
+
               isStartNode: node.isStartNode || false,
               isEndNode: node.isEndNode || false,
               image: node.image || null,
