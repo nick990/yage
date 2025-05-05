@@ -12,8 +12,11 @@ export const ChoiceNode = memo(
     const { setNodes, setEdges } = useReactFlow();
     const nodeRef = useRef<HTMLDivElement>(null);
     const WIDTH = 350;
-    const TRIGGER_HEIGHT = 68;
-    const HEIGHT = 160 + (data.triggerMilestone ? TRIGGER_HEIGHT : 0);
+    const MILESTONE_HEIGHT = 68;
+    const HEIGHT =
+      160 +
+      (data.triggerMilestone ? MILESTONE_HEIGHT : 0) +
+      (data.requiredMilestone ? MILESTONE_HEIGHT : 0);
 
     // Function to handle node deletion
     const handleDelete = (event: React.MouseEvent) => {
@@ -84,7 +87,7 @@ export const ChoiceNode = memo(
           <div
             className="flex flex-col pt-4 pb-4 overflow-hidden"
             style={{
-              height: `${TRIGGER_HEIGHT}px`,
+              height: `${MILESTONE_HEIGHT}px`,
             }}
           >
             <div className="text-sm font-bold text-slate-800">
@@ -92,6 +95,21 @@ export const ChoiceNode = memo(
             </div>
             <div className="text-xs text-slate-600">
               {data.triggerMilestone?.text}
+            </div>
+          </div>
+        )}
+        {data.requiredMilestone && (
+          <div
+            className="flex flex-col pt-4 pb-4 overflow-hidden"
+            style={{
+              height: `${MILESTONE_HEIGHT}px`,
+            }}
+          >
+            <div className="text-sm font-bold text-slate-800">
+              Required Milestone
+            </div>
+            <div className="text-xs text-slate-600">
+              {data.requiredMilestone?.text}
             </div>
           </div>
         )}
